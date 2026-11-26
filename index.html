@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ClassDrop — Student Assignment Upload Portal</title>
+  <title>ClassDrop — Student Assignment Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
@@ -23,7 +23,7 @@
 
   <!-- Top Header -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-20">
-    <div class="max-w-3xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
       <div class="flex items-center gap-3">
         <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold shadow-sm">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
@@ -32,56 +32,46 @@
         </div>
         <div>
           <h1 class="font-bold text-slate-900 text-base leading-tight">ClassDrop Portal</h1>
-          <p class="text-xs text-slate-500">Student Assignment Submission</p>
+          <p class="text-xs text-slate-500">Student Folders &amp; Submissions</p>
         </div>
       </div>
 
-      <span id="assignmentBadge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
-        <span class="w-2 h-2 rounded-full bg-blue-600"></span>
-        <span id="badgeAssignmentText">Assignment-01</span>
-      </span>
+      <div class="flex items-center gap-2">
+        <span id="assignmentBadge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+          <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+          <span id="badgeAssignmentText">Assignment-01</span>
+        </span>
+        <button
+          type="button"
+          id="logoutBtn"
+          class="hidden px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
+        >
+          Sign Out
+        </button>
+      </div>
     </div>
   </header>
 
-  <!-- Main Student Submission Card -->
+  <!-- Main Content -->
   <main class="max-w-3xl w-full mx-auto px-4 sm:px-6 py-8 flex-1">
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+
+    <!-- Step 1: Student Login Screen (Shown Before Authentication) -->
+    <section id="loginCard" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
       <div class="p-6 sm:p-8 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
-        <h2 id="portalTitle" class="text-xl sm:text-2xl font-extrabold text-slate-900">Submit Your Assignment</h2>
-        <p id="portalSubtitle" class="text-sm text-slate-600 mt-1">
-          Download your assignment PDFs below, then enter your login, password, and roll number to submit your work.
+        <h2 id="loginTitle" class="text-xl sm:text-2xl font-extrabold text-slate-900">Student Sign In</h2>
+        <p class="text-sm text-slate-600 mt-1">
+          Sign in with your student login and password to access <b>Shared Docs</b>, your personal assignment folder, and submissions.
         </p>
       </div>
 
-      <!-- Published Assignments (Downloadable PDFs) -->
-      <div class="px-6 sm:px-8 py-5 bg-blue-50/50 border-b border-slate-100">
-        <div class="flex items-center justify-between gap-3 mb-3">
-          <div>
-            <h3 class="text-sm font-bold text-slate-800">Assignments (Downloadable PDFs)</h3>
-            <p class="text-xs text-slate-500">Enter your login and password below to load PDFs shared specifically with your folder, or click Refresh List.</p>
-          </div>
-          <button
-            type="button"
-            id="refreshAssignmentsBtn"
-            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 transition"
-          >
-            Refresh List
-          </button>
-        </div>
-        <div id="assignmentsPdfList" class="space-y-2 text-xs text-slate-600">
-          Loading assignment PDFs...
-        </div>
-      </div>
-
-      <form id="submissionForm" class="p-6 sm:p-8 space-y-6">
-        <!-- Student Login & Password -->
+      <form id="loginForm" class="p-6 sm:p-8 space-y-5">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label for="studentName" class="block text-sm font-semibold text-slate-700 mb-1.5">
+            <label for="loginName" class="block text-sm font-semibold text-slate-700 mb-1.5">
               Student Login (Name) <span class="text-rose-500">*</span>
             </label>
             <input
-              id="studentName"
+              id="loginName"
               type="text"
               required
               autocomplete="username"
@@ -91,11 +81,11 @@
           </div>
 
           <div>
-            <label for="studentPass" class="block text-sm font-semibold text-slate-700 mb-1.5">
+            <label for="loginPass" class="block text-sm font-semibold text-slate-700 mb-1.5">
               Student Password <span class="text-rose-500">*</span>
             </label>
             <input
-              id="studentPass"
+              id="loginPass"
               type="password"
               required
               autocomplete="current-password"
@@ -105,76 +95,129 @@
           </div>
         </div>
 
-        <!-- Roll Number / Student ID -->
-        <div>
-          <label for="studentId" class="block text-sm font-semibold text-slate-700 mb-1.5">
-            Roll Number / Student ID <span class="text-rose-500">*</span>
-          </label>
-          <input
-            id="studentId"
-            type="text"
-            required
-            placeholder="e.g., OEL-M01 or OEL-M02"
-            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm mono focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
+        <div id="loginError" class="hidden rounded-xl p-3.5 text-sm bg-rose-50 text-rose-800 border border-rose-200"></div>
 
-        <!-- File Upload Dropzone -->
-        <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1.5">
-            Attach Assignment Files <span class="text-rose-500">*</span>
-          </label>
-          <div
-            id="dropZone"
-            class="border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center cursor-pointer hover:border-blue-400 hover:bg-slate-50 transition"
-          >
-            <input id="fileInput" type="file" multiple class="hidden" />
-            <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-3">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-              </svg>
-            </div>
-            <p class="text-sm font-semibold text-slate-800">
-              Click to choose files or drag &amp; drop here
-            </p>
-            <p class="text-xs text-slate-500 mt-1">
-              Supports PDF, DOCX, ZIP, Images, Python, HTML, JS, or any project files (up to 20 MB per file)
-            </p>
-          </div>
-
-          <!-- Selected Files List -->
-          <ul id="fileList" class="mt-3 space-y-2 hidden"></ul>
-        </div>
-
-        <!-- Optional Notes -->
-        <div>
-          <label for="studentNotes" class="block text-sm font-semibold text-slate-700 mb-1.5">
-            Submission Notes <span class="text-slate-400 font-normal">(Optional)</span>
-          </label>
-          <textarea
-            id="studentNotes"
-            rows="3"
-            placeholder="Any comments or notes for your teacher..."
-            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          ></textarea>
-        </div>
-
-        <!-- Status Alert -->
-        <div id="statusBox" class="hidden rounded-xl p-4 text-sm"></div>
-
-        <!-- Single Clean Submit Action -->
         <button
-          id="submitBtn"
+          id="loginBtn"
           type="submit"
-          class="w-full py-3.5 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold text-sm shadow-sm transition flex items-center justify-center gap-2"
+          class="w-full py-3 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold text-sm shadow-sm transition"
         >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-          </svg>
-          <span>Submit Work to Instructor</span>
+          Access My Folders &amp; Assignments
         </button>
       </form>
-    </div>
+    </section>
+
+    <!-- Step 2: Authenticated Student Workspace (Hidden Until Login Succeeds) -->
+    <section id="portalWorkspace" class="hidden space-y-6">
+
+      <!-- Student Session & Folder Overview -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wider text-blue-600">Signed In Student</p>
+            <h2 id="portalTitle" class="text-xl sm:text-2xl font-extrabold text-slate-900 mt-0.5">Assignment-01</h2>
+            <p class="text-sm text-slate-600 mt-1">
+              Student: <b id="sessionStudentName">-</b> &bull; Roll No: <span id="sessionRollNo" class="mono font-semibold text-slate-800">-</span>
+            </p>
+          </div>
+          <div class="flex flex-wrap gap-2 text-xs">
+            <span class="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 font-semibold">
+              Folder: <span class="mono">Shared Docs</span>
+            </span>
+            <span class="px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold">
+              Folder: <span id="sessionStudentFolder" class="mono">-</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shared Docs & Personal Assignment PDFs -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="px-6 sm:px-8 py-5 bg-blue-50/50 border-b border-slate-100 flex items-center justify-between gap-3">
+          <div>
+            <h3 class="text-base font-bold text-slate-900">Shared Docs &amp; Assignment PDFs</h3>
+            <p class="text-xs text-slate-500">Files under <b>Shared Docs</b> and your personal folder for this assignment.</p>
+          </div>
+          <button
+            type="button"
+            id="refreshAssignmentsBtn"
+            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 transition"
+          >
+            Refresh List
+          </button>
+        </div>
+        <div id="assignmentsPdfList" class="p-6 sm:p-8 space-y-4 text-xs text-slate-600">
+          Loading folders...
+        </div>
+      </div>
+
+      <!-- Assignment Submission Form -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="p-6 sm:p-8 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
+          <h3 class="text-lg sm:text-xl font-extrabold text-slate-900">Submit Your Assignment</h3>
+          <p class="text-sm text-slate-600 mt-1">
+            Upload your completed files to your assignment submission folder.
+          </p>
+        </div>
+
+        <form id="submissionForm" class="p-6 sm:p-8 space-y-6">
+          <!-- File Upload Dropzone -->
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1.5">
+              Attach Assignment Files <span class="text-rose-500">*</span>
+            </label>
+            <div
+              id="dropZone"
+              class="border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center cursor-pointer hover:border-blue-400 hover:bg-slate-50 transition"
+            >
+              <input id="fileInput" type="file" multiple class="hidden" />
+              <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-3">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+              </div>
+              <p class="text-sm font-semibold text-slate-800">
+                Click to choose files or drag &amp; drop here
+              </p>
+              <p class="text-xs text-slate-500 mt-1">
+                Supports PDF, DOCX, ZIP, Images, Python, HTML, JS, or any project files (up to 20 MB per file)
+              </p>
+            </div>
+
+            <!-- Selected Files List -->
+            <ul id="fileList" class="mt-3 space-y-2 hidden"></ul>
+          </div>
+
+          <!-- Optional Notes -->
+          <div>
+            <label for="studentNotes" class="block text-sm font-semibold text-slate-700 mb-1.5">
+              Submission Notes <span class="text-slate-400 font-normal">(Optional)</span>
+            </label>
+            <textarea
+              id="studentNotes"
+              rows="3"
+              placeholder="Any comments or notes for your teacher..."
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            ></textarea>
+          </div>
+
+          <!-- Status Alert -->
+          <div id="statusBox" class="hidden rounded-xl p-4 text-sm"></div>
+
+          <!-- Single Clean Submit Action -->
+          <button
+            id="submitBtn"
+            type="submit"
+            class="w-full py-3.5 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold text-sm shadow-sm transition flex items-center justify-center gap-2"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+            <span>Submit Work to Instructor</span>
+          </button>
+        </form>
+      </div>
+    </section>
   </main>
 
   <footer class="py-5 text-center text-xs text-slate-400">
@@ -190,61 +233,119 @@
     };
 
     document.getElementById('badgeAssignmentText').textContent = config.assignment;
-    document.getElementById('portalTitle').textContent = `Submit: ${config.assignment}`;
+    document.getElementById('portalTitle').textContent = `${config.assignment} Workspace`;
 
+    const loginCard = document.getElementById('loginCard');
+    const portalWorkspace = document.getElementById('portalWorkspace');
+    const loginForm = document.getElementById('loginForm');
+    const loginNameInput = document.getElementById('loginName');
+    const loginPassInput = document.getElementById('loginPass');
+    const loginError = document.getElementById('loginError');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
     const assignmentsPdfListEl = document.getElementById('assignmentsPdfList');
     const refreshAssignmentsBtn = document.getElementById('refreshAssignmentsBtn');
-    const studentNameInput = document.getElementById('studentName');
-    const studentPassInput = document.getElementById('studentPass');
+
+    let authSession = {
+      studentName: '',
+      studentPass: '',
+      rollNo: '',
+      studentFolder: ''
+    };
+
+    function showLoginError(msg) {
+      loginError.classList.remove('hidden');
+      loginError.textContent = msg;
+    }
+
+    function hideLoginError() {
+      loginError.classList.add('hidden');
+      loginError.textContent = '';
+    }
 
     function getStudentAuthQuery() {
-      const sName = encodeURIComponent((studentNameInput.value || '').trim());
-      const sPass = encodeURIComponent(studentPassInput.value || '');
-      return `&studentName=${sName}&studentPass=${sPass}`;
+      return `&studentName=${encodeURIComponent(authSession.studentName)}&studentPass=${encodeURIComponent(authSession.studentPass)}`;
+    }
+
+    function renderPdfRow(file) {
+      const safeName = escapeHtml(file.name);
+      const safeScope = escapeHtml(file.scope || 'shared');
+      return `
+        <div class="flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200">
+          <div class="truncate">
+            <span class="font-semibold text-slate-800">${safeName}</span>
+            <span class="text-slate-400 ml-2">(${Math.max(1, Math.round((file.size || 0) / 1024))} KB)</span>
+          </div>
+          <button
+            type="button"
+            onclick="downloadPublishedPdf('${safeName}', '${safeScope}', this)"
+            class="shrink-0 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition"
+          >
+            Download PDF
+          </button>
+        </div>
+      `;
+    }
+
+    async function fetchAuthorizedFolders() {
+      if (!authSession.studentName || !authSession.studentPass) {
+        return { ok: false, error: 'Please sign in first.' };
+      }
+      const url = `${config.relay}?action=listAssignments&repo=${encodeURIComponent(config.repo)}&assignment=${encodeURIComponent(config.assignment)}${getStudentAuthQuery()}`;
+      const res = await fetch(url);
+      return await res.json();
     }
 
     async function loadPublishedPdfs() {
-      if (!config.relay) {
-        assignmentsPdfListEl.innerHTML = '<span class="text-rose-600">Relay URL not configured.</span>';
+      if (!authSession.studentName || !authSession.studentPass) {
         return;
       }
-      assignmentsPdfListEl.innerHTML = 'Loading assignment PDFs...';
+      assignmentsPdfListEl.innerHTML = 'Loading folders...';
       try {
-        const url = `${config.relay}?action=listAssignments&repo=${encodeURIComponent(config.repo)}&assignment=${encodeURIComponent(config.assignment)}${getStudentAuthQuery()}`;
-        const res = await fetch(url);
-        const data = await res.json();
+        const data = await fetchAuthorizedFolders();
         if (!data.ok) {
-          throw new Error(data.error || 'Could not load assignments.');
+          throw new Error(data.error || 'Could not load folders.');
         }
-        if (!data.files || !data.files.length) {
-          assignmentsPdfListEl.innerHTML = `<div class="p-3 rounded-xl bg-white border border-slate-200 text-slate-500">No PDFs published yet for <b>${escapeHtml(config.assignment)}</b>.</div>`;
-          return;
-        }
-        assignmentsPdfListEl.innerHTML = data.files.map(file => {
-          const scopeBadge = file.scope === 'student'
-            ? '<span class="ml-2 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">For You</span>'
-            : '<span class="ml-2 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-600">Class</span>';
-          const safeName = escapeHtml(file.name);
-          const safeScope = escapeHtml(file.scope || 'all');
-          return `
-            <div class="flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl bg-white border border-slate-200">
-              <div class="truncate">
-                <span class="font-semibold text-slate-800">${safeName}</span>
-                ${scopeBadge}
-                <span class="text-slate-400 ml-2">(${Math.max(1, Math.round((file.size || 0) / 1024))} KB)</span>
-              </div>
-              <button
-                type="button"
-                onclick="downloadPublishedPdf('${safeName}', '${safeScope}', this)"
-                class="shrink-0 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition"
-              >
-                Download PDF
-              </button>
+
+        authSession.studentName = data.studentName || authSession.studentName;
+        authSession.rollNo = data.rollNo || authSession.rollNo;
+        authSession.studentFolder = data.studentFolder || authSession.studentFolder;
+
+        document.getElementById('sessionStudentName').textContent = authSession.studentName;
+        document.getElementById('sessionRollNo').textContent = authSession.rollNo || '-';
+        document.getElementById('sessionStudentFolder').textContent = authSession.studentFolder || '-';
+
+        const allFiles = Array.isArray(data.files) ? data.files : [];
+        const sharedFiles = allFiles.filter(f => f.scope === 'shared');
+        const personalFiles = allFiles.filter(f => f.scope === 'student');
+
+        const sharedSectionHtml = `
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
+              Folder: Shared Docs
             </div>
-          `;
-        }).join('');
+            ${sharedFiles.length
+              ? `<div class="space-y-2">${sharedFiles.map(renderPdfRow).join('')}</div>`
+              : `<div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-500">No shared PDFs in <b>Shared Docs</b> for <b>${escapeHtml(config.assignment)}</b>.</div>`
+            }
+          </div>
+        `;
+
+        const personalSectionHtml = `
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-emerald-700 mb-2">
+              Folder: ${escapeHtml(authSession.studentFolder || 'Personal Folder')}
+            </div>
+            ${personalFiles.length
+              ? `<div class="space-y-2">${personalFiles.map(renderPdfRow).join('')}</div>`
+              : `<div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-500">No personal PDFs in <b>${escapeHtml(authSession.studentFolder || 'your folder')}</b> for <b>${escapeHtml(config.assignment)}</b>.</div>`
+            }
+          </div>
+        `;
+
+        assignmentsPdfListEl.innerHTML = sharedSectionHtml + personalSectionHtml;
       } catch (err) {
-        assignmentsPdfListEl.innerHTML = `<span class="text-rose-600">Error loading PDFs: ${escapeHtml(err.message)}</span>`;
+        assignmentsPdfListEl.innerHTML = `<span class="text-rose-600">Error loading folders: ${escapeHtml(err.message)}</span>`;
       }
     }
 
@@ -253,7 +354,7 @@
       btnEl.disabled = true;
       btnEl.textContent = 'Downloading...';
       try {
-        const url = `${config.relay}?action=downloadPdf&repo=${encodeURIComponent(config.repo)}&assignment=${encodeURIComponent(config.assignment)}&file=${encodeURIComponent(fileName)}&scope=${encodeURIComponent(scope || 'all')}${getStudentAuthQuery()}`;
+        const url = `${config.relay}?action=downloadPdf&repo=${encodeURIComponent(config.repo)}&assignment=${encodeURIComponent(config.assignment)}&file=${encodeURIComponent(fileName)}&scope=${encodeURIComponent(scope || 'shared')}${getStudentAuthQuery()}`;
         const res = await fetch(url);
         const data = await res.json();
         if (!data.ok || !data.base64) {
@@ -273,10 +374,67 @@
       }
     }
 
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideLoginError();
+
+      const studentName = loginNameInput.value.trim();
+      const studentPass = loginPassInput.value;
+
+      if (!studentName || !studentPass) {
+        showLoginError('Please enter both your Student Login and Student Password.');
+        return;
+      }
+      if (!config.relay) {
+        showLoginError('Relay URL not configured.');
+        return;
+      }
+
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'Signing in...';
+
+      authSession = {
+        studentName,
+        studentPass,
+        rollNo: '',
+        studentFolder: ''
+      };
+
+      try {
+        const data = await fetchAuthorizedFolders();
+        if (!data.ok || !data.authenticated) {
+          throw new Error(data.error || 'Invalid login credentials.');
+        }
+
+        authSession.studentName = data.studentName || studentName;
+        authSession.rollNo = data.rollNo || '';
+        authSession.studentFolder = data.studentFolder || '';
+
+        loginCard.classList.add('hidden');
+        portalWorkspace.classList.remove('hidden');
+        logoutBtn.classList.remove('hidden');
+        await loadPublishedPdfs();
+      } catch (err) {
+        authSession = { studentName: '', studentPass: '', rollNo: '', studentFolder: '' };
+        showLoginError(err.message);
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Access My Folders & Assignments';
+      }
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      authSession = { studentName: '', studentPass: '', rollNo: '', studentFolder: '' };
+      loginPassInput.value = '';
+      selectedFiles = [];
+      renderFileList();
+      statusBox.classList.add('hidden');
+      portalWorkspace.classList.add('hidden');
+      logoutBtn.classList.add('hidden');
+      loginCard.classList.remove('hidden');
+    });
+
     refreshAssignmentsBtn.addEventListener('click', loadPublishedPdfs);
-    studentNameInput.addEventListener('change', loadPublishedPdfs);
-    studentPassInput.addEventListener('change', loadPublishedPdfs);
-    loadPublishedPdfs();
 
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
@@ -382,13 +540,8 @@
 
     document.getElementById('submissionForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const studentName = document.getElementById('studentName').value.trim();
-      const studentPass = document.getElementById('studentPass').value;
-      const studentId = document.getElementById('studentId').value.trim();
-      const notes = document.getElementById('studentNotes').value.trim();
-
-      if (!studentName || !studentPass || !studentId) {
-        showStatus('Please enter your Student Login, Password, and Roll Number / Student ID.', 'error');
+      if (!authSession.studentName || !authSession.studentPass) {
+        showStatus('Please sign in first before submitting work.', 'error');
         return;
       }
       if (!selectedFiles.length) {
@@ -414,21 +567,13 @@
         const payload = {
           repo: config.repo,
           assignment: config.assignment,
-          studentName,
-          studentPass,
-          studentId,
-          notes,
+          studentName: authSession.studentName,
+          studentPass: authSession.studentPass,
+          studentId: authSession.rollNo,
+          notes: document.getElementById('studentNotes').value.trim(),
           submittedAt: new Date().toISOString(),
           files: encodedFiles
         };
-
-        if (!config.relay) {
-          showStatus(
-            '<strong>Submission Link Incomplete:</strong> Ask your teacher for the complete ClassDrop submission link containing the relay endpoint.',
-            'error'
-          );
-          return;
-        }
 
         const resp = await fetch(config.relay, {
           method: 'POST',
@@ -446,7 +591,7 @@
         }
 
         showStatus(
-          `<strong>Submitted Successfully!</strong><br/>Thank you, <b>${escapeHtml(studentName)}</b> (${escapeHtml(studentId)}). Your work was delivered to <b>${escapeHtml(result.folder || config.assignment)}</b>.`,
+          `<strong>Submitted Successfully!</strong><br/>Thank you, <b>${escapeHtml(authSession.studentName)}</b> (${escapeHtml(authSession.rollNo)}). Your work was delivered to <b>${escapeHtml(result.folder || config.assignment)}</b>.`,
           'success'
         );
         selectedFiles = [];
