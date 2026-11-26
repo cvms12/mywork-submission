@@ -58,7 +58,7 @@
         <div class="flex items-center justify-between gap-3 mb-3">
           <div>
             <h3 class="text-sm font-bold text-slate-800">Assignments (Downloadable PDFs)</h3>
-            <p class="text-xs text-slate-500">Download your assignment PDFs before uploading your solution.</p>
+            <p class="text-xs text-slate-500">Enter your login and password below to load PDFs shared specifically with your folder, or click Refresh List.</p>
           </div>
           <button
             type="button"
@@ -194,6 +194,14 @@
 
     const assignmentsPdfListEl = document.getElementById('assignmentsPdfList');
     const refreshAssignmentsBtn = document.getElementById('refreshAssignmentsBtn');
+    const studentNameInput = document.getElementById('studentName');
+    const studentPassInput = document.getElementById('studentPass');
+
+    function getStudentAuthQuery() {
+      const sName = encodeURIComponent((studentNameInput.value || '').trim());
+      const sPass = encodeURIComponent(studentPassInput.value || '');
+      return `&studentName=${sName}&studentPass=${sPass}`;
+    }
 
     async function loadPublishedPdfs() {
       if (!config.relay) {
@@ -202,7 +210,7 @@
       }
       assignmentsPdfListEl.innerHTML = 'Loading assignment PDFs...';
       try {
-        const url = `${config.relay}?action=listAssignments&repo=${encodeURIComponent(config.repo)}&assignment=${encodeURIComponent(config.assignment)}`;
+        const url = `${config.relay}?action=listAssignments&repo=${encodeURIComponent(config.repo)}&assignment=${encodeURIComponent(config.assignment)}${getStudentAuthQuery()}`;
         const res = await fetch(url);
         const data = await res.json();
         if (!data.ok) {
@@ -212,32 +220,40 @@
           assignmentsPdfListEl.innerHTML = `<div class="p-3 rounded-xl bg-white border border-slate-200 text-slate-500">No PDFs published yet for <b>${escapeHtml(config.assignment)}</b>.</div>`;
           return;
         }
-        assignmentsPdfListEl.innerHTML = data.files.map(file => `
-          <div class="flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl bg-white border border-slate-200">
-            <div class="truncate">
-              <span class="font-semibold text-slate-800">${escapeHtml(file.name)}</span>
-              <span class="text-slate-400 ml-2">(${Math.max(1, Math.round((file.size || 0) / 1024))} KB)</span>
+        assignmentsPdfListEl.innerHTML = data.files.map(file => {
+          const scopeBadge = file.scope === 'student'
+            ? '<span class="ml-2 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">For You</span>'
+            : '<span class="ml-2 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-600">Class</span>';
+          const safeName = escapeHtml(file.name);
+          const safeScope = escapeHtml(file.scope || 'all');
+          return `
+            <div class="flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl bg-white border border-slate-200">
+              <div class="truncate">
+                <span class="font-semibold text-slate-800">${safeName}</span>
+                ${scopeBadge}
+                <span class="text-slate-400 ml-2">(${Math.max(1, Math.round((file.size || 0) / 1024))} KB)</span>
+              </div>
+              <button
+                type="button"
+                onclick="downloadPublishedPdf('${safeName}', '${safeScope}', this)"
+                class="shrink-0 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition"
+              >
+                Download PDF
+              </button>
             </div>
-            <button
-              type="button"
-              onclick="downloadPublishedPdf('${escapeHtml(file.name)}', this)"
-              class="shrink-0 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition"
-            >
-              Download PDF
-            </button>
-          </div>
-        `).join('');
+          `;
+        }).join('');
       } catch (err) {
         assignmentsPdfListEl.innerHTML = `<span class="text-rose-600">Error loading PDFs: ${escapeHtml(err.message)}</span>`;
       }
     }
 
-    async function downloadPublishedPdf(fileName, btnEl) {
+    async function downloadPublishedPdf(fileName, scope, btnEl) {
       const originalText = btnEl.textContent;
       btnEl.disabled = true;
       btnEl.textContent = 'Downloading...';
       try {
-        const url = `${config.relay}?action=downloadPdf&repo=${encodeURIComponent(config.repo)}&assignment=${encodeURIComponent(config.assignment)}&file=${encodeURIComponent(fileName)}`;
+        const url = `${config.relay}?action=downloadPdf&repo=${encodeURIComponent(config.repo)}&assignment=${encodeURIComponent(config.assignment)}&file=${encodeURIComponent(fileName)}&scope=${encodeURIComponent(scope || 'all')}${getStudentAuthQuery()}`;
         const res = await fetch(url);
         const data = await res.json();
         if (!data.ok || !data.base64) {
@@ -258,6 +274,8 @@
     }
 
     refreshAssignmentsBtn.addEventListener('click', loadPublishedPdfs);
+    studentNameInput.addEventListener('change', loadPublishedPdfs);
+    studentPassInput.addEventListener('change', loadPublishedPdfs);
     loadPublishedPdfs();
 
     const dropZone = document.getElementById('dropZone');
