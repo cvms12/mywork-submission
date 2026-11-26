@@ -84,7 +84,8 @@
       addPdfs(Array.from((e.dataTransfer && e.dataTransfer.files) || []));
     });
     pdfInput.addEventListener('change', (e) => {
-      addPdfs(Array.from(e.target.files || []));
+      const files = (e && e.target && e.target.files) || pdfInput.files || [];
+      addPdfs(Array.from(files));
       pdfInput.value = '';
     });
 
