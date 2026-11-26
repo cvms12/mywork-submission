@@ -16,7 +16,7 @@
   <div class="max-w-2xl mx-auto bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
     <div class="p-6 sm:p-8 border-b border-slate-100">
       <h1 class="text-xl font-extrabold text-slate-900">Publish Assignment PDFs</h1>
-      <p class="text-sm text-slate-600 mt-1">Drop PDF assignments here to automatically share them on Dhriti &amp; Jainesh's portal.</p>
+      <p class="text-sm text-slate-600 mt-1">Choose All Students or a specific student folder to share assignment PDFs.</p>
     </div>
 
     <form id="publishForm" class="p-6 sm:p-8 space-y-5">
@@ -31,9 +31,19 @@
         </div>
       </div>
 
-      <div>
-        <label class="block text-sm font-semibold text-slate-700 mb-1">Assignment Folder</label>
-        <input id="assignmentName" type="text" required value="Assignment-01" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm mono" />
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1">Assignment Folder</label>
+          <input id="assignmentName" type="text" required value="Assignment-01" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm mono" />
+        </div>
+        <div>
+          <label for="targetStudent" class="block text-sm font-semibold text-slate-700 mb-1">Share With Student</label>
+          <select id="targetStudent" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white">
+            <option value="all">All Students (Shared Folder)</option>
+            <option value="dhriti">Dhriti — OEL-M01_Dhriti</option>
+            <option value="jainesh">Jainesh — OEL-M02_Jainesh</option>
+          </select>
+        </div>
       </div>
 
       <div>
@@ -41,7 +51,7 @@
         <div id="dropZone" class="border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center cursor-pointer hover:border-blue-400 transition">
           <input id="pdfInput" type="file" accept=".pdf,application/pdf" multiple class="hidden" />
           <p class="text-sm font-semibold text-slate-800">Click or drag &amp; drop PDF files here</p>
-          <p class="text-xs text-slate-500 mt-1">Only .pdf files are published to the student Assignments list</p>
+          <p class="text-xs text-slate-500 mt-1">Only .pdf files are published to the selected folder</p>
         </div>
         <ul id="pdfList" class="mt-3 space-y-2 hidden"></ul>
       </div>
@@ -49,7 +59,7 @@
       <div id="pubStatus" class="hidden rounded-xl p-4 text-sm"></div>
 
       <button id="publishBtn" type="submit" class="w-full py-3 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm transition">
-        Publish PDFs to Student Portal
+        Publish PDFs
       </button>
     </form>
   </div>
@@ -143,6 +153,7 @@
         for (const f of queuedPdfs) {
           files.push({ name: f.name, size: f.size, contentBase64: await toBase64(f) });
         }
+        const targetStudent = document.getElementById('targetStudent').value;
         const res = await fetch(RELAY, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -150,6 +161,7 @@
             mode: 'publishAssignment',
             repo: REPO,
             assignment: document.getElementById('assignmentName').value.trim(),
+            targetStudent,
             teacherId: document.getElementById('teacherId').value.trim(),
             teacherPass: document.getElementById('teacherPass').value,
             files
@@ -157,14 +169,14 @@
         });
         const data = await res.json();
         if (!data.ok) throw new Error(data.error || 'Publish failed');
-        showPubStatus(`Published to <b>${data.folder}</b>. Both Dhriti and Jainesh can now download it on their portal.`, 'success');
+        showPubStatus(`Published to <b>${data.folder}</b> for <b>${data.targetStudent}</b>.`, 'success');
         queuedPdfs = [];
         renderPdfs();
       } catch (err) {
         showPubStatus(`Publish failed: ${err.message}`, 'error');
       } finally {
         publishBtn.disabled = false;
-        publishBtn.textContent = 'Publish PDFs to Student Portal';
+        publishBtn.textContent = 'Publish PDFs';
       }
     });
   </script>
