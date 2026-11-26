@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ClassDrop — Student Assignment Portal</title>
+  <title>ClassDrop — 3D Student Learning & Assignment Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -17,10 +18,10 @@
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       background:
-        radial-gradient(circle at 12% 8%, rgba(125, 211, 252, 0.55) 0%, transparent 42%),
-        radial-gradient(circle at 88% 14%, rgba(56, 189, 248, 0.36) 0%, transparent 45%),
-        radial-gradient(circle at 50% 95%, rgba(186, 230, 253, 0.55) 0%, transparent 50%),
-        linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 48%, #f8fafc 100%);
+        radial-gradient(circle at 12% 6%, rgba(125, 211, 252, 0.65) 0%, transparent 40%),
+        radial-gradient(circle at 88% 12%, rgba(56, 189, 248, 0.45) 0%, transparent 44%),
+        radial-gradient(circle at 50% 96%, rgba(186, 230, 253, 0.65) 0%, transparent 52%),
+        linear-gradient(180deg, #eff8ff 0%, #dbeafe 46%, #f0f9ff 100%);
       color: #0c4a6e;
       overflow-x: hidden;
     }
@@ -29,38 +30,38 @@
 
     .sky-grid-bg {
       background-image:
-        linear-gradient(to right, rgba(14, 165, 233, 0.08) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(14, 165, 233, 0.08) 1px, transparent 1px);
-      background-size: 36px 36px;
+        linear-gradient(to right, rgba(14, 165, 233, 0.09) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(14, 165, 233, 0.09) 1px, transparent 1px);
+      background-size: 34px 34px;
     }
 
     .glass-card {
-      background: rgba(255, 255, 255, 0.86);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(186, 230, 253, 0.95);
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1.5px solid rgba(186, 230, 253, 0.95);
       box-shadow:
-        0 20px 45px -18px rgba(3, 105, 161, 0.22),
-        0 4px 14px -4px rgba(14, 165, 233, 0.12),
-        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        0 24px 50px -18px rgba(3, 105, 161, 0.25),
+        0 6px 18px -4px rgba(14, 165, 233, 0.14),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
     }
 
     .btn-3d-blue {
-      background: linear-gradient(135deg, #0284c7 0%, #0369a1 55%, #1d4ed8 100%);
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 45%, #1d4ed8 100%);
       box-shadow:
-        0 10px 22px -6px rgba(2, 132, 199, 0.55),
+        0 12px 24px -6px rgba(2, 132, 199, 0.58),
         0 4px 0 #075985,
-        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+        inset 0 1px 0 rgba(255, 255, 255, 0.45);
       transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
     }
 
     .btn-3d-blue:hover:not(:disabled) {
-      filter: brightness(1.05);
-      transform: translateY(-1px);
+      filter: brightness(1.06);
+      transform: translateY(-2px);
       box-shadow:
-        0 14px 26px -6px rgba(2, 132, 199, 0.62),
+        0 16px 28px -6px rgba(2, 132, 199, 0.66),
         0 5px 0 #075985,
-        inset 0 1px 0 rgba(255, 255, 255, 0.45);
+        inset 0 1px 0 rgba(255, 255, 255, 0.55);
     }
 
     .btn-3d-blue:active:not(:disabled) {
@@ -70,47 +71,57 @@
         0 2px 0 #075985;
     }
 
-    /* Interactive 3D Stage */
     .stage-3d-wrap {
-      perspective: 1100px;
+      perspective: 1200px;
     }
 
     .stage-3d-card {
       transform-style: preserve-3d;
-      transition: transform 0.25s ease-out;
-      background: linear-gradient(135deg, #0c4a6e 0%, #0369a1 48%, #0284c7 100%);
+      transition: transform 0.22s ease-out;
+      background: linear-gradient(135deg, #082f49 0%, #0369a1 46%, #0284c7 82%, #38bdf8 100%);
       box-shadow:
-        0 24px 50px -16px rgba(12, 74, 110, 0.42),
-        inset 0 1px 0 rgba(255, 255, 255, 0.28);
+        0 28px 60px -16px rgba(12, 74, 110, 0.48),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    }
+
+    .tilt-card {
+      transition: transform 0.22s ease, box-shadow 0.22s ease;
+    }
+
+    .tilt-card:hover {
+      transform: translateY(-3px);
+      box-shadow:
+        0 28px 55px -18px rgba(3, 105, 161, 0.3),
+        0 8px 20px -6px rgba(14, 165, 233, 0.18);
     }
 
     @keyframes floatSlow {
-      0%, 100% { transform: translateY(0px) rotate(-2deg); }
+      0%, 100% { transform: translateY(0px) rotate(-1.5deg); }
       50% { transform: translateY(-8px) rotate(1.5deg); }
     }
 
     @keyframes floatAlt {
-      0%, 100% { transform: translateY(0px) rotate(2deg); }
-      50% { transform: translateY(-6px) rotate(-1.5deg); }
+      0%, 100% { transform: translateY(0px) rotate(1.5deg); }
+      50% { transform: translateY(-7px) rotate(-1.5deg); }
     }
 
-    @keyframes pulseOrbit {
-      0%, 100% { transform: scale(1); opacity: 0.55; }
-      50% { transform: scale(1.08); opacity: 0.85; }
+    @keyframes cloudDrift {
+      0%, 100% { transform: translateX(0px); }
+      50% { transform: translateX(18px); }
     }
 
-    .float-a { animation: floatSlow 5.2s ease-in-out infinite; }
-    .float-b { animation: floatAlt 6s ease-in-out infinite; }
-    .orbit-glow { animation: pulseOrbit 4.4s ease-in-out infinite; }
+    .float-a { animation: floatSlow 5s ease-in-out infinite; }
+    .float-b { animation: floatAlt 5.8s ease-in-out infinite; }
+    .cloud-drift { animation: cloudDrift 9s ease-in-out infinite; }
 
     .drop-active {
       border-color: #0284c7 !important;
-      background-color: rgba(224, 242, 254, 0.75) !important;
-      transform: scale(1.005);
+      background-color: rgba(224, 242, 254, 0.85) !important;
+      transform: scale(1.01);
     }
 
     .input-sky {
-      background: rgba(248, 250, 252, 0.9);
+      background: rgba(248, 250, 252, 0.94);
       border: 1.5px solid #bae6fd;
       color: #0f172a;
       transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
@@ -119,44 +130,51 @@
     .input-sky:focus {
       background: #ffffff;
       border-color: #0284c7;
-      box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.16);
+      box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.18);
       outline: none;
+    }
+
+    #threeCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
     }
   </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between sky-grid-bg">
 
-  <!-- Top Header -->
-  <header class="bg-white/80 backdrop-blur-md border-b border-sky-200/80 sticky top-0 z-20">
+  <!-- Top Navigation Bar -->
+  <header class="bg-white/85 backdrop-blur-lg border-b border-sky-200/90 sticky top-0 z-30 shadow-2xs">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
       <div class="flex items-center gap-3">
-        <!-- 3D Brand Emblem -->
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-sky-400 via-sky-600 to-blue-800 text-white flex items-center justify-center shadow-md shadow-sky-700/25 border border-sky-300/60">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
-            <path d="M12 3L21 8L12 13L3 8L12 3Z" fill="rgba(255,255,255,0.92)" />
-            <path d="M6 11.2V16.5C6 18.4 8.7 20 12 20C15.3 20 18 18.4 18 16.5V11.2L12 14.5L6 11.2Z" fill="rgba(186,230,253,0.85)" />
+        <!-- 3D Cube Academy Emblem -->
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-sky-400 via-sky-600 to-blue-800 text-white flex items-center justify-center shadow-md shadow-sky-700/30 border border-sky-300/70">
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2.5L21 7.5L12 12.5L3 7.5L12 2.5Z" fill="#FFFFFF" />
+            <path d="M3 7.5L12 12.5V21.5L3 16.5V7.5Z" fill="#7DD3FC" />
+            <path d="M21 7.5L12 12.5V21.5L21 16.5V7.5Z" fill="#0284C7" />
           </svg>
         </div>
         <div>
           <div class="flex items-center gap-2">
             <h1 class="font-extrabold text-sky-950 text-base sm:text-lg tracking-tight leading-none">ClassDrop</h1>
-            <span class="hidden sm:inline-block px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-md bg-sky-100 text-sky-800 border border-sky-200">
-              Learning Hub
+            <span class="hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider rounded-full bg-gradient-to-r from-sky-100 to-blue-100 text-sky-800 border border-sky-300">
+              <span>3D Academy Studio</span>
             </span>
           </div>
-          <p class="text-xs text-sky-700/80 mt-0.5">Guided Assignments &bull; Folder Workspace</p>
+          <p class="text-xs text-sky-700/85 mt-0.5">Interactive Sky Classroom &bull; Folder Vault</p>
         </div>
       </div>
 
       <div class="flex items-center gap-2">
-        <span id="assignmentBadge" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-sky-100/90 text-sky-900 border border-sky-300 shadow-xs">
-          <span class="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></span>
+        <span id="assignmentBadge" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-extrabold bg-sky-100 text-sky-900 border border-sky-300 shadow-2xs">
+          <span class="w-2 h-2 rounded-full bg-sky-500 animate-ping"></span>
           <span id="badgeAssignmentText">Assignment-01</span>
         </span>
         <button
           type="button"
           id="logoutBtn"
-          class="hidden px-3.5 py-1.5 rounded-full text-xs font-bold bg-white hover:bg-sky-50 text-sky-900 border border-sky-300 shadow-xs transition"
+          class="hidden px-3.5 py-1.5 rounded-full text-xs font-bold bg-white hover:bg-sky-50 text-sky-900 border border-sky-300 shadow-2xs transition cursor-pointer"
         >
           Sign Out
         </button>
@@ -167,103 +185,80 @@
   <!-- Main Content -->
   <main class="max-w-4xl w-full mx-auto px-4 sm:px-6 py-7 sm:py-9 flex-1 space-y-6">
 
-    <!-- 3D Teaching & Assignment Showcase Banner -->
+    <!-- Interactive WebGL 3D Sky Classroom Banner -->
     <div id="heroStageWrap" class="stage-3d-wrap">
-      <div id="heroStageCard" class="stage-3d-card relative rounded-3xl p-6 sm:p-7 text-white overflow-hidden">
-        <!-- Decorative Sky Orbs -->
-        <div class="orbit-glow absolute -top-14 -right-14 w-56 h-56 rounded-full bg-sky-300/25 blur-xl pointer-events-none"></div>
-        <div class="absolute -bottom-16 left-10 w-64 h-64 rounded-full bg-cyan-400/20 blur-2xl pointer-events-none"></div>
+      <div id="heroStageCard" class="stage-3d-card relative rounded-3xl p-6 sm:p-8 text-white overflow-hidden">
+        <!-- Soft Sky Clouds & Glow Orbs -->
+        <div class="cloud-drift absolute -top-12 right-16 w-48 h-24 rounded-full bg-white/15 blur-xl pointer-events-none"></div>
+        <div class="absolute -bottom-16 -left-10 w-64 h-64 rounded-full bg-cyan-300/20 blur-2xl pointer-events-none"></div>
 
         <div class="relative z-10 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-          <div class="md:col-span-7 space-y-2.5">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 border border-white/25 text-[11px] font-semibold tracking-wide text-sky-100">
-              <span>3D CLASSROOM WORKSPACE</span>
+          <div class="md:col-span-7 space-y-3">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 border border-white/30 text-[11px] font-bold tracking-wide text-sky-100 backdrop-blur-xs">
+              <span>INTERACTIVE 3D CLASSROOM</span>
               <span>&bull;</span>
-              <span>PDF &amp; SUBMISSION STUDIO</span>
+              <span>DRAG THE 3D MODEL</span>
             </div>
-            <h2 class="text-xl sm:text-2xl font-extrabold tracking-tight leading-snug text-white">
-              Learn, Download Assignment PDFs &amp; Turn In Your Work in One Place
+            <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight leading-tight text-white">
+              Your Sky-High Digital Study Desk
             </h2>
-            <p class="text-xs sm:text-sm text-sky-100/90 leading-relaxed max-w-xl">
-              Step into your personal study space to open class materials from <b>Shared Docs</b>, grab worksheets tailored to your roll-number folder, and upload completed solutions effortlessly.
+            <p class="text-xs sm:text-sm text-sky-100/95 leading-relaxed max-w-xl">
+              Explore your assignment materials in <b>Shared Docs</b>, download PDFs curated for your roll number, and launch your finished work straight into your instructor's vault.
             </p>
+
+            <!-- Mini Feature Pills -->
+            <div class="flex flex-wrap gap-2 pt-1 text-[11px] font-bold">
+              <span class="px-3 py-1 rounded-xl bg-white/15 border border-white/25 text-white flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-cyan-300"></span>
+                <span>Shared Docs Library</span>
+              </span>
+              <span class="px-3 py-1 rounded-xl bg-white/15 border border-white/25 text-white flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-sky-300"></span>
+                <span>Personal Roll-No Vault</span>
+              </span>
+              <span class="px-3 py-1 rounded-xl bg-white/15 border border-white/25 text-white flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-300"></span>
+                <span>Instant PDF Delivery</span>
+              </span>
+            </div>
           </div>
 
-          <!-- 3D Isometric Learning Stack Illustration -->
-          <div class="md:col-span-5 flex items-center justify-center">
-            <svg class="w-full max-w-[270px] h-auto drop-shadow-[0_18px_24px_rgba(7,89,133,0.55)]" viewBox="0 0 300 185" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <linearGradient id="isoPlatformTop" x1="45" y1="95" x2="255" y2="155" gradientUnits="userSpaceOnUse">
-                  <stop stop-color="#E0F2FE" />
-                  <stop offset="1" stop-color="#7DD3FC" />
-                </linearGradient>
-                <linearGradient id="isoPlatformSide" x1="45" y1="120" x2="255" y2="175" gradientUnits="userSpaceOnUse">
-                  <stop stop-color="#0284C7" />
-                  <stop offset="1" stop-color="#0369A1" />
-                </linearGradient>
-                <linearGradient id="docSheet" x1="80" y1="30" x2="175" y2="105" gradientUnits="userSpaceOnUse">
-                  <stop stop-color="#FFFFFF" />
-                  <stop offset="1" stop-color="#E0F2FE" />
-                </linearGradient>
-                <linearGradient id="folder3d" x1="165" y1="45" x2="245" y2="110" gradientUnits="userSpaceOnUse">
-                  <stop stop-color="#38BDF8" />
-                  <stop offset="1" stop-color="#1D4ED8" />
-                </linearGradient>
-              </defs>
-
-              <!-- Floating Sky Rings -->
-              <ellipse cx="150" cy="132" rx="112" ry="38" stroke="#BAE6FD" stroke-opacity="0.35" stroke-width="1.5" stroke-dasharray="5 5" />
-
-              <!-- 3D Base Pedestal -->
-              <polygon points="150,92 248,132 150,172 52,132" fill="url(#isoPlatformTop)" />
-              <polygon points="52,132 150,172 150,182 52,142" fill="#0369A1" />
-              <polygon points="248,132 150,172 150,182 248,142" fill="#1E3A8A" />
-
-              <!-- Floating 3D Assignment PDF Sheet -->
-              <g class="float-a">
-                <polygon points="72,42 136,18 178,42 114,66" fill="url(#docSheet)" />
-                <polygon points="72,42 114,66 114,114 72,90" fill="#BAE6FD" />
-                <polygon points="114,66 178,42 178,90 114,114" fill="#E0F2FE" />
-                <line x1="124" y1="68" x2="166" y2="52" stroke="#0284C7" stroke-width="3" stroke-linecap="round" />
-                <line x1="124" y1="79" x2="158" y2="66" stroke="#38BDF8" stroke-width="2.5" stroke-linecap="round" />
-                <line x1="124" y1="90" x2="150" y2="80" stroke="#7DD3FC" stroke-width="2.5" stroke-linecap="round" />
-                <circle cx="93" cy="76" r="9" fill="#0284C7" />
-                <text x="93" y="79" text-anchor="middle" fill="#FFFFFF" font-size="7" font-weight="800" font-family="Plus Jakarta Sans, sans-serif">PDF</text>
-              </g>
-
-              <!-- Floating 3D Folder Cube -->
-              <g class="float-b">
-                <polygon points="168,52 195,41 208,48 181,59" fill="#7DD3FC" />
-                <polygon points="168,52 215,34 252,55 205,73" fill="url(#folder3d)" />
-                <polygon points="168,52 205,73 205,115 168,94" fill="#0284C7" />
-                <polygon points="205,73 252,55 252,97 205,115" fill="#1E40AF" />
-                <!-- Upload Arrow Emblem -->
-                <path d="M228 89V71M228 71L221 77M228 71L235 77" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
-              </g>
-
-              <!-- Sparkle Accents -->
-              <circle cx="62" cy="108" r="3" fill="#FFFFFF" />
-              <circle cx="242" cy="34" r="3.5" fill="#E0F2FE" />
-              <circle cx="256" cy="112" r="2.5" fill="#7DD3FC" />
-            </svg>
+          <!-- Live Interactive Three.js 3D Learning Cube & Orbiting Books/Crystals -->
+          <div class="md:col-span-5 flex flex-col items-center justify-center">
+            <div id="threeContainer" class="w-full h-52 sm:h-56 rounded-2xl bg-sky-950/35 border border-white/20 backdrop-blur-xs relative overflow-hidden cursor-grab active:cursor-grabbing shadow-inner">
+              <canvas id="threeCanvas"></canvas>
+              <span class="absolute bottom-2 right-2.5 text-[10px] font-semibold text-sky-100/80 bg-sky-950/50 px-2 py-0.5 rounded-full pointer-events-none">
+                3D Interactive &bull; Drag to Spin
+              </span>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Step 1: Student Login Screen (Shown Before Authentication) -->
-    <section id="loginCard" class="glass-card rounded-3xl overflow-hidden">
-      <div class="p-6 sm:p-8 border-b border-sky-100 bg-gradient-to-r from-sky-50/90 via-white to-sky-50/60">
+    <section id="loginCard" class="glass-card tilt-card rounded-3xl overflow-hidden">
+      <div class="p-6 sm:p-8 border-b border-sky-100 bg-gradient-to-r from-sky-50/95 via-white to-sky-50/70">
         <div class="flex items-center justify-between gap-3">
-          <div>
-            <span class="text-[11px] font-bold uppercase tracking-wider text-sky-600">Student Portal Access</span>
-            <h2 id="loginTitle" class="text-xl sm:text-2xl font-extrabold text-sky-950 mt-0.5">Student Sign In</h2>
+          <div class="flex items-center gap-3.5">
+            <!-- 3D Key / Shield Badge -->
+            <div class="float-a w-12 h-12 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-700 text-white flex items-center justify-center shadow-lg shadow-sky-600/25 border border-sky-300 shrink-0">
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3l7 3v5c0 5-3.2 8.8-7 10-3.8-1.2-7-5-7-10V6l7-3z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.5 12l1.8 1.8 3.4-3.6" />
+              </svg>
+            </div>
+            <div>
+              <span class="text-[11px] font-extrabold uppercase tracking-wider text-sky-600">Student Portal Access</span>
+              <h2 id="loginTitle" class="text-xl sm:text-2xl font-extrabold text-sky-950 mt-0.5">Student Sign In</h2>
+            </div>
           </div>
-          <div class="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-100 text-sky-800 text-xs font-semibold">
-            <span>Protected Folders</span>
+          <div class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sky-100 text-sky-900 text-xs font-bold border border-sky-200">
+            <span class="w-2 h-2 rounded-full bg-sky-500"></span>
+            <span>Protected Classroom</span>
           </div>
         </div>
-        <p class="text-sm text-sky-800/80 mt-1.5">
+        <p class="text-sm text-sky-800/85 mt-2">
           Sign in with your student login, Roll No, and password to unlock <b>Shared Docs</b>, your personal assignment folder, and submissions.
         </p>
       </div>
@@ -317,9 +312,12 @@
         <button
           id="loginBtn"
           type="submit"
-          class="btn-3d-blue w-full py-3.5 px-6 rounded-xl text-white font-bold text-sm tracking-wide cursor-pointer"
+          class="btn-3d-blue w-full py-3.5 px-6 rounded-xl text-white font-extrabold text-sm tracking-wide cursor-pointer flex items-center justify-center gap-2"
         >
-          Access My Folders &amp; Assignments
+          <span>Launch My 3D Classroom &amp; Folders</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          </svg>
         </button>
       </form>
     </section>
@@ -328,20 +326,25 @@
     <section id="portalWorkspace" class="hidden space-y-6">
 
       <!-- Student Session & Folder Overview -->
-      <div class="glass-card rounded-3xl p-6 sm:p-8">
+      <div class="glass-card tilt-card rounded-3xl p-6 sm:p-8">
         <div class="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p class="text-xs font-extrabold uppercase tracking-wider text-sky-600">Signed In Student</p>
-            <h2 id="portalTitle" class="text-xl sm:text-2xl font-extrabold text-sky-950 mt-0.5">Assignment-01</h2>
-            <p class="text-sm text-sky-800/85 mt-1">
-              Student: <b id="sessionStudentName" class="text-sky-950">-</b> &bull; Roll No: <span id="sessionRollNo" class="mono font-semibold text-sky-900">-</span>
-            </p>
+          <div class="flex items-center gap-3.5">
+            <div class="float-b w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-700 text-white flex items-center justify-center font-extrabold text-lg shadow-md shadow-sky-600/25 border border-sky-200">
+              <span id="sessionAvatarLetter">S</span>
+            </div>
+            <div>
+              <p class="text-xs font-extrabold uppercase tracking-wider text-sky-600">Active Student Desk</p>
+              <h2 id="portalTitle" class="text-xl sm:text-2xl font-extrabold text-sky-950 mt-0.5">Assignment-01</h2>
+              <p class="text-sm text-sky-800/85 mt-0.5">
+                Student: <b id="sessionStudentName" class="text-sky-950">-</b> &bull; Roll No: <span id="sessionRollNo" class="mono font-semibold text-sky-900">-</span>
+              </p>
+            </div>
           </div>
           <div class="flex flex-wrap gap-2 text-xs">
-            <span class="px-3.5 py-2 rounded-xl bg-sky-100/90 text-sky-900 border border-sky-200 font-semibold shadow-2xs">
+            <span class="px-3.5 py-2 rounded-xl bg-sky-100/90 text-sky-900 border border-sky-200 font-bold shadow-2xs">
               Folder: <span class="mono">Shared Docs</span>
             </span>
-            <span class="px-3.5 py-2 rounded-xl bg-cyan-100/80 text-cyan-950 border border-cyan-300 font-semibold shadow-2xs">
+            <span class="px-3.5 py-2 rounded-xl bg-cyan-100/80 text-cyan-950 border border-cyan-300 font-bold shadow-2xs">
               Folder: <span id="sessionStudentFolder" class="mono">-</span>
             </span>
           </div>
@@ -349,16 +352,16 @@
       </div>
 
       <!-- Shared Docs & Personal Assignment PDFs -->
-      <div class="glass-card rounded-3xl overflow-hidden">
-        <div class="px-6 sm:px-8 py-5 bg-gradient-to-r from-sky-100/75 via-sky-50/75 to-white border-b border-sky-200/70 flex items-center justify-between gap-3">
+      <div class="glass-card tilt-card rounded-3xl overflow-hidden">
+        <div class="px-6 sm:px-8 py-5 bg-gradient-to-r from-sky-100/80 via-sky-50/80 to-white border-b border-sky-200/70 flex items-center justify-between gap-3">
           <div>
             <h3 class="text-base sm:text-lg font-extrabold text-sky-950">Shared Docs &amp; Assignment PDFs</h3>
-            <p class="text-xs text-sky-700/85">Files under <b>Shared Docs</b> and your personal folder for this assignment.</p>
+            <p class="text-xs text-sky-700/85">Download worksheets from <b>Shared Docs</b> and your personal folder.</p>
           </div>
           <button
             type="button"
             id="refreshAssignmentsBtn"
-            class="px-3.5 py-2 rounded-xl text-xs font-bold bg-white hover:bg-sky-50 text-sky-900 border border-sky-300 shadow-2xs transition cursor-pointer"
+            class="px-3.5 py-2 rounded-xl text-xs font-extrabold bg-white hover:bg-sky-50 text-sky-900 border border-sky-300 shadow-2xs transition cursor-pointer"
           >
             Refresh List
           </button>
@@ -369,11 +372,11 @@
       </div>
 
       <!-- Assignment Submission Form -->
-      <div class="glass-card rounded-3xl overflow-hidden">
+      <div class="glass-card tilt-card rounded-3xl overflow-hidden">
         <div class="p-6 sm:p-8 border-b border-sky-100 bg-gradient-to-r from-sky-50/90 via-white to-sky-50/60">
           <h3 class="text-lg sm:text-xl font-extrabold text-sky-950">Submit Your Assignment</h3>
           <p class="text-sm text-sky-800/80 mt-1">
-            Upload your completed files to your assignment submission folder.
+            Drop your completed files below to send them straight to your assignment folder.
           </p>
         </div>
 
@@ -385,15 +388,15 @@
             </label>
             <div
               id="dropZone"
-              class="border-2 border-dashed border-sky-300 rounded-2xl p-8 text-center cursor-pointer bg-sky-50/40 hover:border-sky-500 hover:bg-sky-100/50 transition"
+              class="border-2 border-dashed border-sky-300 rounded-2xl p-8 text-center cursor-pointer bg-sky-50/45 hover:border-sky-500 hover:bg-sky-100/55 transition"
             >
               <input id="fileInput" type="file" multiple class="hidden" />
-              <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-600 text-white flex items-center justify-center mx-auto mb-3 shadow-md shadow-sky-600/25">
+              <div class="float-a w-14 h-14 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-600 text-white flex items-center justify-center mx-auto mb-3 shadow-lg shadow-sky-600/30 border border-sky-200">
                 <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                 </svg>
               </div>
-              <p class="text-sm font-bold text-sky-950">
+              <p class="text-sm font-extrabold text-sky-950">
                 Click to choose files or drag &amp; drop here
               </p>
               <p class="text-xs text-sky-700/80 mt-1">
@@ -425,7 +428,7 @@
           <button
             id="submitBtn"
             type="submit"
-            class="btn-3d-blue w-full py-3.5 px-6 rounded-xl text-white font-bold text-sm tracking-wide flex items-center justify-center gap-2 cursor-pointer"
+            class="btn-3d-blue w-full py-3.5 px-6 rounded-xl text-white font-extrabold text-sm tracking-wide flex items-center justify-center gap-2 cursor-pointer"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
@@ -437,12 +440,177 @@
     </section>
   </main>
 
-  <footer class="py-6 text-center text-xs text-sky-800/70 font-medium">
-    ClassDrop Learning Hub &bull; Sky-Grade Student Assignment Portal
+  <footer class="py-6 text-center text-xs text-sky-800/75 font-semibold">
+    ClassDrop 3D Learning Hub &bull; Sky-Grade Student Assignment Portal
   </footer>
 
   <script>
-    // Subtle 3D tilt interaction on the hero showcase
+    // 1. Interactive Three.js 3D Learning Scene (Floating Knowledge Core + Orbiting Book/Folder Cubes + Sky Particles)
+    (function initThreeScene() {
+      const container = document.getElementById('threeContainer');
+      const canvas = document.getElementById('threeCanvas');
+      if (!container || !canvas || typeof THREE === 'undefined') return;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(42, container.clientWidth / container.clientHeight, 0.1, 100);
+      camera.position.set(0, 0.3, 6.2);
+
+      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setSize(container.clientWidth, container.clientHeight);
+
+      // Sky & Ocean Lighting
+      const ambientLight = new THREE.AmbientLight(0xe0f2fe, 1.05);
+      scene.add(ambientLight);
+
+      const keyLight = new THREE.DirectionalLight(0xffffff, 1.35);
+      keyLight.position.set(4, 6, 5);
+      scene.add(keyLight);
+
+      const rimLight = new THREE.PointLight(0x38bdf8, 1.8, 18);
+      rimLight.position.set(-4, -2, 3);
+      scene.add(rimLight);
+
+      const worldGroup = new THREE.Group();
+      scene.add(worldGroup);
+
+      // Central 3D Icosahedron "Knowledge Crystal"
+      const coreGeo = new THREE.IcosahedronGeometry(1.12, 0);
+      const coreMat = new THREE.MeshStandardMaterial({
+        color: 0x38bdf8,
+        emissive: 0x0284c7,
+        emissiveIntensity: 0.35,
+        roughness: 0.22,
+        metalness: 0.25,
+        flatShading: true
+      });
+      const coreMesh = new THREE.Mesh(coreGeo, coreMat);
+      worldGroup.add(coreMesh);
+
+      // Wireframe Sky Halo around the Knowledge Crystal
+      const wireGeo = new THREE.IcosahedronGeometry(1.38, 1);
+      const wireMat = new THREE.MeshBasicMaterial({
+        color: 0xe0f2fe,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.35
+      });
+      const wireMesh = new THREE.Mesh(wireGeo, wireMat);
+      worldGroup.add(wireMesh);
+
+      // Orbiting 3D Torus Ring
+      const ringGeo = new THREE.TorusGeometry(2.05, 0.045, 16, 72);
+      const ringMat = new THREE.MeshStandardMaterial({
+        color: 0xbae6fd,
+        emissive: 0x7dd3fc,
+        emissiveIntensity: 0.3,
+        roughness: 0.3
+      });
+      const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+      ringMesh.rotation.x = Math.PI / 2.7;
+      ringMesh.rotation.y = 0.25;
+      worldGroup.add(ringMesh);
+
+      // 3D Floating Assignment Cubes (Representing Shared Docs, Personal Folder, & Submissions)
+      const satelliteSpecs = [
+        { color: 0xffffff, angle: 0, radius: 2.05, size: 0.36 },
+        { color: 0x7dd3fc, angle: (Math.PI * 2) / 3, radius: 2.05, size: 0.34 },
+        { color: 0x34d399, angle: (Math.PI * 4) / 3, radius: 2.05, size: 0.32 }
+      ];
+      const satellites = satelliteSpecs.map(spec => {
+        const boxGeo = new THREE.BoxGeometry(spec.size, spec.size * 1.25, spec.size * 0.45);
+        const boxMat = new THREE.MeshStandardMaterial({
+          color: spec.color,
+          roughness: 0.25,
+          metalness: 0.15
+        });
+        const mesh = new THREE.Mesh(boxGeo, boxMat);
+        worldGroup.add(mesh);
+        return { mesh, baseAngle: spec.angle, radius: spec.radius };
+      });
+
+      // Floating Sky Star/Cloud Particles
+      const particleCount = 48;
+      const positions = new Float32Array(particleCount * 3);
+      for (let i = 0; i < particleCount; i++) {
+        positions[i * 3] = (Math.random() - 0.5) * 9;
+        positions[i * 3 + 1] = (Math.random() - 0.5) * 5.5;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 5;
+      }
+      const pGeo = new THREE.BufferGeometry();
+      pGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      const pMat = new THREE.PointsMaterial({
+        color: 0xe0f2fe,
+        size: 0.08,
+        transparent: true,
+        opacity: 0.85
+      });
+      const particles = new THREE.Points(pGeo, pMat);
+      scene.add(particles);
+
+      // Drag-to-spin interaction
+      let isDragging = false;
+      let prevX = 0;
+      let prevY = 0;
+      let targetRotY = 0.3;
+      let targetRotX = 0.1;
+
+      container.addEventListener('pointerdown', (e) => {
+        isDragging = true;
+        prevX = e.clientX;
+        prevY = e.clientY;
+      });
+      window.addEventListener('pointerup', () => { isDragging = false; });
+      window.addEventListener('pointermove', (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - prevX;
+        const dy = e.clientY - prevY;
+        prevX = e.clientX;
+        prevY = e.clientY;
+        targetRotY += dx * 0.012;
+        targetRotX = Math.max(-0.8, Math.min(0.8, targetRotX + dy * 0.012));
+      });
+
+      window.addEventListener('resize', () => {
+        if (!container.clientWidth || !container.clientHeight) return;
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+      });
+
+      const clock = new THREE.Clock();
+      function animate() {
+        requestAnimationFrame(animate);
+        const t = clock.getElapsedTime();
+
+        if (!isDragging) {
+          targetRotY += 0.005;
+        }
+        worldGroup.rotation.y += (targetRotY - worldGroup.rotation.y) * 0.08;
+        worldGroup.rotation.x += (targetRotX - worldGroup.rotation.x) * 0.08;
+
+        coreMesh.rotation.y = t * 0.45;
+        coreMesh.rotation.z = Math.sin(t * 0.7) * 0.15;
+        wireMesh.rotation.y = -t * 0.25;
+        particles.rotation.y = t * 0.06;
+
+        satellites.forEach((sat, idx) => {
+          const a = sat.baseAngle + t * 0.75;
+          sat.mesh.position.set(
+            Math.cos(a) * sat.radius,
+            Math.sin(t * 1.4 + idx) * 0.38,
+            Math.sin(a) * sat.radius
+          );
+          sat.mesh.rotation.y = -a;
+          sat.mesh.rotation.x = Math.sin(t + idx) * 0.25;
+        });
+
+        renderer.render(scene, camera);
+      }
+      animate();
+    })();
+
+    // Subtle 3D tilt on the outer hero banner
     const heroStageWrap = document.getElementById('heroStageWrap');
     const heroStageCard = document.getElementById('heroStageCard');
     if (heroStageWrap && heroStageCard) {
@@ -450,7 +618,7 @@
         const rect = heroStageWrap.getBoundingClientRect();
         const x = (e.clientX - rect.left) / rect.width - 0.5;
         const y = (e.clientY - rect.top) / rect.height - 0.5;
-        heroStageCard.style.transform = `rotateX(${(-y * 7).toFixed(2)}deg) rotateY(${(x * 9).toFixed(2)}deg)`;
+        heroStageCard.style.transform = `rotateX(${(-y * 5).toFixed(2)}deg) rotateY(${(x * 6).toFixed(2)}deg)`;
       });
       heroStageWrap.addEventListener('mouseleave', () => {
         heroStageCard.style.transform = 'rotateX(0deg) rotateY(0deg)';
@@ -504,20 +672,20 @@
       const safeName = escapeHtml(file.name);
       const safeScope = escapeHtml(file.scope || 'shared');
       return `
-        <div class="flex items-center justify-between gap-3 px-4 py-3 rounded-2xl bg-white/95 border border-sky-200/90 shadow-2xs hover:border-sky-400 transition">
+        <div class="flex items-center justify-between gap-3 px-4 py-3 rounded-2xl bg-white/95 border border-sky-200/90 shadow-2xs hover:border-sky-400 hover:shadow-sm transition">
           <div class="flex items-center gap-3 min-w-0">
-            <span class="w-8 h-8 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center font-extrabold text-[10px] shrink-0 border border-sky-200">
+            <span class="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-100 to-blue-100 text-sky-800 flex items-center justify-center font-extrabold text-[10px] shrink-0 border border-sky-300 shadow-2xs">
               PDF
             </span>
             <div class="truncate">
               <span class="font-bold text-sky-950">${safeName}</span>
-              <span class="text-sky-600/80 ml-2">(${Math.max(1, Math.round((file.size || 0) / 1024))} KB)</span>
+              <span class="text-sky-600/85 ml-2">(${Math.max(1, Math.round((file.size || 0) / 1024))} KB)</span>
             </div>
           </div>
           <button
             type="button"
             onclick="downloadPublishedPdf('${safeName}', '${safeScope}', this)"
-            class="shrink-0 px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold shadow-xs transition cursor-pointer"
+            class="shrink-0 px-3.5 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-bold shadow-xs transition cursor-pointer"
           >
             Download PDF
           </button>
@@ -538,7 +706,7 @@
       if (!authSession.studentName || !authSession.rollNo || !authSession.studentPass) {
         return;
       }
-      assignmentsPdfListEl.innerHTML = '<div class="text-sky-700 font-medium">Loading folders...</div>';
+      assignmentsPdfListEl.innerHTML = '<div class="text-sky-700 font-semibold">Loading folders...</div>';
       try {
         const data = await fetchAuthorizedFolders();
         if (!data.ok) {
@@ -550,6 +718,7 @@
         authSession.studentFolder = data.studentFolder || authSession.studentFolder;
 
         document.getElementById('sessionStudentName').textContent = authSession.studentName;
+        document.getElementById('sessionAvatarLetter').textContent = (authSession.studentName || 'S').charAt(0).toUpperCase();
         document.getElementById('sessionRollNo').textContent = authSession.rollNo || '-';
         document.getElementById('sessionStudentFolder').textContent = authSession.studentFolder || '-';
 
@@ -632,7 +801,7 @@
       }
 
       loginBtn.disabled = true;
-      loginBtn.textContent = 'Signing in...';
+      loginBtn.innerHTML = '<span>Unlocking 3D Classroom...</span>';
 
       authSession = {
         studentName,
@@ -663,7 +832,12 @@
         showLoginError(err.message);
       } finally {
         loginBtn.disabled = false;
-        loginBtn.textContent = 'Access My Folders & Assignments';
+        loginBtn.innerHTML = `
+          <span>Launch My 3D Classroom &amp; Folders</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          </svg>
+        `;
       }
     });
 
@@ -733,12 +907,12 @@
       }
       fileListEl.classList.remove('hidden');
       fileListEl.innerHTML = selectedFiles.map((f, idx) => `
-        <li class="flex items-center justify-between px-4 py-2.5 rounded-xl bg-sky-50/90 border border-sky-200 text-sm">
+        <li class="flex items-center justify-between px-4 py-2.5 rounded-xl bg-sky-50/95 border border-sky-200 text-sm">
           <div class="truncate pr-3">
-            <span class="font-semibold text-sky-950">${escapeHtml(f.name)}</span>
+            <span class="font-bold text-sky-950">${escapeHtml(f.name)}</span>
             <span class="text-xs text-sky-600 ml-2">(${(f.size / 1024).toFixed(1)} KB)</span>
           </div>
-          <button type="button" onclick="removeFile(${idx})" class="text-xs font-bold text-rose-600 hover:text-rose-700 cursor-pointer">
+          <button type="button" onclick="removeFile(${idx})" class="text-xs font-extrabold text-rose-600 hover:text-rose-700 cursor-pointer">
             Remove
           </button>
         </li>
