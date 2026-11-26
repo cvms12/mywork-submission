@@ -81,10 +81,10 @@
     dropZone.addEventListener('drop', (e) => {
       e.preventDefault();
       dropZone.classList.remove('drop-active');
-      addPdfs(Array.from(e.dataTransfer.files));
+      addPdfs(Array.from((e.dataTransfer && e.dataTransfer.files) || []));
     });
     pdfInput.addEventListener('change', (e) => {
-      addPdfs(Array.from(e.dataTransfer.files || e.target.files));
+      addPdfs(Array.from(e.target.files || []));
       pdfInput.value = '';
     });
 
