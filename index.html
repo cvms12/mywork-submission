@@ -60,7 +60,7 @@
       <div class="p-6 sm:p-8 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
         <h2 id="loginTitle" class="text-xl sm:text-2xl font-extrabold text-slate-900">Student Sign In</h2>
         <p class="text-sm text-slate-600 mt-1">
-          Sign in with your student login and password to access <b>Shared Docs</b>, your personal assignment folder, and submissions.
+          Sign in with your student login, Roll No, and password to access <b>Shared Docs</b>, your personal assignment folder, and submissions.
         </p>
       </div>
 
@@ -81,18 +81,31 @@
           </div>
 
           <div>
-            <label for="loginPass" class="block text-sm font-semibold text-slate-700 mb-1.5">
-              Student Password <span class="text-rose-500">*</span>
+            <label for="loginRollNo" class="block text-sm font-semibold text-slate-700 mb-1.5">
+              Login ID (Roll No) <span class="text-rose-500">*</span>
             </label>
             <input
-              id="loginPass"
-              type="password"
+              id="loginRollNo"
+              type="text"
               required
-              autocomplete="current-password"
-              placeholder="Enter your password"
+              placeholder="e.g., OEL-M01 or OEL-M02"
               class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm mono focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
+        </div>
+
+        <div>
+          <label for="loginPass" class="block text-sm font-semibold text-slate-700 mb-1.5">
+            Student Password <span class="text-rose-500">*</span>
+          </label>
+          <input
+            id="loginPass"
+            type="password"
+            required
+            autocomplete="current-password"
+            placeholder="Enter your password"
+            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm mono focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
         </div>
 
         <div id="loginError" class="hidden rounded-xl p-3.5 text-sm bg-rose-50 text-rose-800 border border-rose-200"></div>
@@ -239,6 +252,7 @@
     const portalWorkspace = document.getElementById('portalWorkspace');
     const loginForm = document.getElementById('loginForm');
     const loginNameInput = document.getElementById('loginName');
+    const loginRollNoInput = document.getElementById('loginRollNo');
     const loginPassInput = document.getElementById('loginPass');
     const loginError = document.getElementById('loginError');
     const loginBtn = document.getElementById('loginBtn');
@@ -264,7 +278,7 @@
     }
 
     function getStudentAuthQuery() {
-      return `&studentName=${encodeURIComponent(authSession.studentName)}&studentPass=${encodeURIComponent(authSession.studentPass)}`;
+      return `&studentName=${encodeURIComponent(authSession.studentName)}&studentId=${encodeURIComponent(authSession.rollNo)}&studentPass=${encodeURIComponent(authSession.studentPass)}`;
     }
 
     function renderPdfRow(file) {
@@ -288,7 +302,7 @@
     }
 
     async function fetchAuthorizedFolders() {
-      if (!authSession.studentName || !authSession.studentPass) {
+      if (!authSession.studentName || !authSession.rollNo || !authSession.studentPass) {
         return { ok: false, error: 'Please sign in first.' };
       }
       const url = `${config.relay}?action=listAssignments&repo=${encodeURIComponent(config.repo)}&assignment=${encodeURIComponent(config.assignment)}${getStudentAuthQuery()}`;
@@ -297,7 +311,7 @@
     }
 
     async function loadPublishedPdfs() {
-      if (!authSession.studentName || !authSession.studentPass) {
+      if (!authSession.studentName || !authSession.rollNo || !authSession.studentPass) {
         return;
       }
       assignmentsPdfListEl.innerHTML = 'Loading folders...';
@@ -379,10 +393,11 @@
       hideLoginError();
 
       const studentName = loginNameInput.value.trim();
+      const studentRollNo = loginRollNoInput.value.trim().toUpperCase();
       const studentPass = loginPassInput.value;
 
-      if (!studentName || !studentPass) {
-        showLoginError('Please enter both your Student Login and Student Password.');
+      if (!studentName || !studentRollNo || !studentPass) {
+        showLoginError('Please enter your Student Login, Roll No, and Student Password.');
         return;
       }
       if (!config.relay) {
@@ -396,7 +411,7 @@
       authSession = {
         studentName,
         studentPass,
-        rollNo: '',
+        rollNo: studentRollNo,
         studentFolder: ''
       };
 
@@ -405,9 +420,12 @@
         if (!data.ok || !data.authenticated) {
           throw new Error(data.error || 'Invalid login credentials.');
         }
+        if (data.rollNo && data.rollNo.toUpperCase() !== studentRollNo) {
+          throw new Error(`Roll No mismatch. Expected ${data.rollNo} for ${data.studentName || studentName}.`);
+        }
 
         authSession.studentName = data.studentName || studentName;
-        authSession.rollNo = data.rollNo || '';
+        authSession.rollNo = data.rollNo || studentRollNo;
         authSession.studentFolder = data.studentFolder || '';
 
         loginCard.classList.add('hidden');
@@ -452,10 +470,14 @@
     dropZone.addEventListener('drop', (e) => {
       e.preventDefault();
       dropZone.classList.remove('drop-active');
-      addFiles(Array.from(e.dataTransfer.files));
+      const dtFiles = e && e.dataTransfer && e.dataTransfer.files ? Array.from(e.dataTransfer.files) : [];
+      addFiles(dtFiles);
     });
     fileInput.addEventListener('change', (e) => {
-      addFiles(Array.from(e.target.files));
+      const picked = e && e.target && e.target.files
+        ? Array.from(e.target.files)
+        : (fileInput.files ? Array.from(fileInput.files) : []);
+      addFiles(picked);
       fileInput.value = '';
     });
 
@@ -540,7 +562,7 @@
 
     document.getElementById('submissionForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      if (!authSession.studentName || !authSession.studentPass) {
+      if (!authSession.studentName || !authSession.rollNo || !authSession.studentPass) {
         showStatus('Please sign in first before submitting work.', 'error');
         return;
       }
