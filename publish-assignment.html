@@ -16,7 +16,7 @@
   <div class="max-w-2xl mx-auto bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
     <div class="p-6 sm:p-8 border-b border-slate-100">
       <h1 class="text-xl font-extrabold text-slate-900">Publish Assignment PDFs</h1>
-      <p class="text-sm text-slate-600 mt-1">Publish PDFs into <b>Shared Docs</b> for all students or into a specific student's folder.</p>
+      <p class="text-sm text-slate-600 mt-1">Drop PDF assignments here to share them into <b>Shared Docs</b> or a specific student's folder.</p>
     </div>
 
     <form id="publishForm" class="p-6 sm:p-8 space-y-5">
@@ -59,7 +59,7 @@
       <div id="pubStatus" class="hidden rounded-xl p-4 text-sm"></div>
 
       <button id="publishBtn" type="submit" class="w-full py-3 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm transition">
-        Publish PDFs
+        Publish PDFs to Student Portal
       </button>
     </form>
   </div>
@@ -81,11 +81,14 @@
     dropZone.addEventListener('drop', (e) => {
       e.preventDefault();
       dropZone.classList.remove('drop-active');
-      addPdfs(Array.from((e.dataTransfer && e.dataTransfer.files) || []));
+      const dtFiles = e && e.dataTransfer && e.dataTransfer.files ? Array.from(e.dataTransfer.files) : [];
+      addPdfs(dtFiles);
     });
     pdfInput.addEventListener('change', (e) => {
-      const files = (e && e.target && e.target.files) || pdfInput.files || [];
-      addPdfs(Array.from(files));
+      const picked = e && e.target && e.target.files
+        ? Array.from(e.target.files)
+        : (pdfInput.files ? Array.from(pdfInput.files) : []);
+      addPdfs(picked);
       pdfInput.value = '';
     });
 
@@ -170,14 +173,15 @@
         });
         const data = await res.json();
         if (!data.ok) throw new Error(data.error || 'Publish failed');
-        showPubStatus(`Published to <b>${data.folder}</b> for <b>${data.targetStudent}</b>.`, 'success');
+        const destLabel = data.targetStudent ? ` for <b>${data.targetStudent}</b>` : '';
+        showPubStatus(`Published to <b>${data.folder}</b>${destLabel}.`, 'success');
         queuedPdfs = [];
         renderPdfs();
       } catch (err) {
         showPubStatus(`Publish failed: ${err.message}`, 'error');
       } finally {
         publishBtn.disabled = false;
-        publishBtn.textContent = 'Publish PDFs';
+        publishBtn.textContent = 'Publish PDFs to Student Portal';
       }
     });
   </script>
