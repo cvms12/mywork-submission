@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ClassDrop — Student Assignment Upload Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    .drop-active {
+      border-color: #2563eb !important;
+      background-color: #eff6ff !important;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+  <!-- Top Header -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-20">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold shadow-sm">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M16 8l-4-4m0 0L8 8m4-4v12" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="font-bold text-slate-900 text-base leading-tight">ClassDrop Portal</h1>
+          <p class="text-xs text-slate-500">Student Assignment Submission</p>
+        </div>
+      </div>
+
+      <span id="assignmentBadge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+        <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+        <span id="badgeAssignmentText">General Assignment</span>
+      </span>
+    </div>
+  </header>
+
+  <!-- Main Student Submission Card -->
+  <main class="max-w-3xl w-full mx-auto px-4 sm:px-6 py-8 flex-1">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="p-6 sm:p-8 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
+        <h2 id="portalTitle" class="text-xl sm:text-2xl font-extrabold text-slate-900">Submit Your Assignment</h2>
+        <p id="portalSubtitle" class="text-sm text-slate-600 mt-1">
+          Enter your details below and upload your completed work directly to your instructor's vault.
+        </p>
+      </div>
+
+      <form id="submissionForm" class="p-6 sm:p-8 space-y-6">
+        <!-- Student Details -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="studentName" class="block text-sm font-semibold text-slate-700 mb-1.5">
+              Student Full Name <span class="text-rose-500">*</span>
+            </label>
+            <input
+              id="studentName"
+              type="text"
+              required
+              placeholder="e.g., Aarav Sharma"
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <div>
+            <label for="studentId" class="block text-sm font-semibold text-slate-700 mb-1.5">
+              Roll Number / Student ID <span class="text-rose-500">*</span>
+            </label>
+            <input
+              id="studentId"
+              type="text"
+              required
+              placeholder="e.g., ROLL-104"
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm mono focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+        </div>
+
+        <!-- File Upload Dropzone -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5">
+            Attach Assignment Files <span class="text-rose-500">*</span>
+          </label>
+          <div
+            id="dropZone"
+            class="border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center cursor-pointer hover:border-blue-400 hover:bg-slate-50 transition"
+          >
+            <input id="fileInput" type="file" multiple class="hidden" />
+            <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-3">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+            </div>
+            <p class="text-sm font-semibold text-slate-800">
+              Click to choose files or drag &amp; drop here
+            </p>
+            <p class="text-xs text-slate-500 mt-1">
+              Supports PDF, DOCX, ZIP, Images, Python, HTML, JS, or any project files (up to 20 MB per file)
+            </p>
+          </div>
+
+          <!-- Selected Files List -->
+          <ul id="fileList" class="mt-3 space-y-2 hidden"></ul>
+        </div>
+
+        <!-- Optional Notes -->
+        <div>
+          <label for="studentNotes" class="block text-sm font-semibold text-slate-700 mb-1.5">
+            Submission Notes <span class="text-slate-400 font-normal">(Optional)</span>
+          </label>
+          <textarea
+            id="studentNotes"
+            rows="3"
+            placeholder="Any comments or notes for your teacher..."
+            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          ></textarea>
+        </div>
+
+        <!-- Status Alert -->
+        <div id="statusBox" class="hidden rounded-xl p-4 text-sm"></div>
+
+        <!-- Single Clean Submit Action -->
+        <button
+          id="submitBtn"
+          type="submit"
+          class="w-full py-3.5 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold text-sm shadow-sm transition flex items-center justify-center gap-2"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+          <span>Submit Work to Instructor</span>
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <footer class="py-5 text-center text-xs text-slate-400">
+    ClassDrop Student Portal &bull; Direct Encrypted Assignment Delivery
+  </footer>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const config = {
+      repo: params.get('repo') || '',
+      assignment: params.get('assignment') || 'Assignment-01',
+      relay: params.get('relay') || ''
+    };
+
+    document.getElementById('badgeAssignmentText').textContent = config.assignment;
+    document.getElementById('portalTitle').textContent = `Submit: ${config.assignment}`;
+
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const fileListEl = document.getElementById('fileList');
+    const statusBox = document.getElementById('statusBox');
+    const submitBtn = document.getElementById('submitBtn');
+    let selectedFiles = [];
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('drop-active');
+    });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drop-active'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('drop-active');
+      addFiles(Array.from(e.dataTransfer.files));
+    });
+    fileInput.addEventListener('change', (e) => {
+      addFiles(Array.from(e.target.files));
+      fileInput.value = '';
+    });
+
+    function addFiles(files) {
+      for (const file of files) {
+        if (file.size > 20 * 1024 * 1024) {
+          showStatus(`"${file.name}" exceeds the 20 MB per-file limit.`, 'error');
+          continue;
+        }
+        if (!selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
+          selectedFiles.push(file);
+        }
+      }
+      renderFileList();
+    }
+
+    function removeFile(idx) {
+      selectedFiles.splice(idx, 1);
+      renderFileList();
+    }
+
+    function renderFileList() {
+      if (!selectedFiles.length) {
+        fileListEl.classList.add('hidden');
+        fileListEl.innerHTML = '';
+        return;
+      }
+      fileListEl.classList.remove('hidden');
+      fileListEl.innerHTML = selectedFiles.map((f, idx) => `
+        <li class="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm">
+          <div class="truncate pr-3">
+            <span class="font-medium text-slate-800">${escapeHtml(f.name)}</span>
+            <span class="text-xs text-slate-500 ml-2">(${(f.size / 1024).toFixed(1)} KB)</span>
+          </div>
+          <button type="button" onclick="removeFile(${idx})" class="text-xs font-semibold text-rose-600 hover:text-rose-700">
+            Remove
+          </button>
+        </li>
+      `).join('');
+    }
+
+    function showStatus(msg, type = 'info') {
+      statusBox.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'border-emerald-200', 'bg-rose-50', 'text-rose-800', 'border-rose-200', 'bg-amber-50', 'text-amber-800', 'border-amber-200', 'border');
+      statusBox.classList.add('border');
+      if (type === 'success') {
+        statusBox.classList.add('bg-emerald-50', 'text-emerald-800', 'border-emerald-200');
+      } else if (type === 'error') {
+        statusBox.classList.add('bg-rose-50', 'text-rose-800', 'border-rose-200');
+      } else {
+        statusBox.classList.add('bg-amber-50', 'text-amber-800', 'border-amber-200');
+      }
+      statusBox.innerHTML = msg;
+    }
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = reader.result || '';
+          resolve(result.split(',')[1] || '');
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+    }
+
+    document.getElementById('submissionForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const studentName = document.getElementById('studentName').value.trim();
+      const studentId = document.getElementById('studentId').value.trim();
+      const notes = document.getElementById('studentNotes').value.trim();
+
+      if (!studentName || !studentId) {
+        showStatus('Please enter both your Full Name and Roll Number / Student ID.', 'error');
+        return;
+      }
+      if (!selectedFiles.length) {
+        showStatus('Please attach at least one file before submitting.', 'error');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span>Uploading your work...</span>';
+
+      try {
+        const encodedFiles = [];
+        for (const f of selectedFiles) {
+          const b64 = await fileToBase64(f);
+          encodedFiles.push({
+            name: f.name,
+            size: f.size,
+            type: f.type || 'application/octet-stream',
+            contentBase64: b64
+          });
+        }
+
+        const payload = {
+          repo: config.repo,
+          assignment: config.assignment,
+          studentName,
+          studentId,
+          notes,
+          submittedAt: new Date().toISOString(),
+          files: encodedFiles
+        };
+
+        if (!config.relay) {
+          showStatus(
+            '<strong>Submission Link Incomplete:</strong> Ask your teacher for the complete ClassDrop submission link containing the relay endpoint.',
+            'error'
+          );
+          return;
+        }
+
+        const resp = await fetch(config.relay, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!resp.ok) {
+          throw new Error(`Server responded with status ${resp.status}`);
+        }
+
+        showStatus(
+          `<strong>Submitted Successfully!</strong><br/>Thank you, <b>${escapeHtml(studentName)}</b> (${escapeHtml(studentId)}). Your ${encodedFiles.length} file(s) have been delivered to <b>${escapeHtml(config.assignment)}</b>.`,
+          'success'
+        );
+        selectedFiles = [];
+        renderFileList();
+        document.getElementById('studentNotes').value = '';
+      } catch (err) {
+        showStatus(`<strong>Upload Failed:</strong> ${escapeHtml(err.message)}`, 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+          <span>Submit Work to Instructor</span>
+        `;
+      }
+    });
+  </script>
+</body>
+</html>
