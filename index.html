@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ClassDrop — 3D Student Learning & Assignment Portal</title>
+  <title>ClassDrop — 3D Student Learning &amp; Assignment Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -139,6 +141,12 @@
       height: 100%;
       display: block;
     }
+
+    .tool-btn-active {
+      background-color: #0284c7 !important;
+      color: #ffffff !important;
+      border-color: #0369a1 !important;
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between sky-grid-bg">
@@ -147,7 +155,6 @@
   <header class="bg-white/85 backdrop-blur-lg border-b border-sky-200/90 sticky top-0 z-30 shadow-2xs">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
       <div class="flex items-center gap-3">
-        <!-- 3D Cube Academy Emblem -->
         <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-sky-400 via-sky-600 to-blue-800 text-white flex items-center justify-center shadow-md shadow-sky-700/30 border border-sky-300/70">
           <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none">
             <path d="M12 2.5L21 7.5L12 12.5L3 7.5L12 2.5Z" fill="#FFFFFF" />
@@ -188,7 +195,6 @@
     <!-- Interactive WebGL 3D Sky Classroom Banner -->
     <div id="heroStageWrap" class="stage-3d-wrap">
       <div id="heroStageCard" class="stage-3d-card relative rounded-3xl p-6 sm:p-8 text-white overflow-hidden">
-        <!-- Soft Sky Clouds & Glow Orbs -->
         <div class="cloud-drift absolute -top-12 right-16 w-48 h-24 rounded-full bg-white/15 blur-xl pointer-events-none"></div>
         <div class="absolute -bottom-16 -left-10 w-64 h-64 rounded-full bg-cyan-300/20 blur-2xl pointer-events-none"></div>
 
@@ -197,33 +203,31 @@
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 border border-white/30 text-[11px] font-bold tracking-wide text-sky-100 backdrop-blur-xs">
               <span>INTERACTIVE 3D CLASSROOM</span>
               <span>&bull;</span>
-              <span>DRAG THE 3D MODEL</span>
+              <span>VIEW, ANNOTATE &amp; SUBMIT PDFS</span>
             </div>
             <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight leading-tight text-white">
               Your Sky-High Digital Study Desk
             </h2>
             <p class="text-xs sm:text-sm text-sky-100/95 leading-relaxed max-w-xl">
-              Explore your assignment materials in <b>Shared Docs</b>, download PDFs curated for your roll number, and launch your finished work straight into your instructor's vault.
+              Open assignment PDFs right inside the portal, draw or add notes directly on pages, insert blank working pages, save your PDF, or send it straight to your instructor.
             </p>
 
-            <!-- Mini Feature Pills -->
             <div class="flex flex-wrap gap-2 pt-1 text-[11px] font-bold">
               <span class="px-3 py-1 rounded-xl bg-white/15 border border-white/25 text-white flex items-center gap-1.5">
                 <span class="w-2 h-2 rounded-full bg-cyan-300"></span>
-                <span>Shared Docs Library</span>
+                <span>Live PDF Annotator</span>
               </span>
               <span class="px-3 py-1 rounded-xl bg-white/15 border border-white/25 text-white flex items-center gap-1.5">
                 <span class="w-2 h-2 rounded-full bg-sky-300"></span>
-                <span>Personal Roll-No Vault</span>
+                <span>Blank Page Inserter</span>
               </span>
               <span class="px-3 py-1 rounded-xl bg-white/15 border border-white/25 text-white flex items-center gap-1.5">
                 <span class="w-2 h-2 rounded-full bg-emerald-300"></span>
-                <span>Instant PDF Delivery</span>
+                <span>1-Click Direct Submit</span>
               </span>
             </div>
           </div>
 
-          <!-- Live Interactive Three.js 3D Learning Cube & Orbiting Books/Crystals -->
           <div class="md:col-span-5 flex flex-col items-center justify-center">
             <div id="threeContainer" class="w-full h-52 sm:h-56 rounded-2xl bg-sky-950/35 border border-white/20 backdrop-blur-xs relative overflow-hidden cursor-grab active:cursor-grabbing shadow-inner">
               <canvas id="threeCanvas"></canvas>
@@ -236,12 +240,11 @@
       </div>
     </div>
 
-    <!-- Step 1: Student Login Screen (Shown Before Authentication) -->
+    <!-- Step 1: Student Login Screen -->
     <section id="loginCard" class="glass-card tilt-card rounded-3xl overflow-hidden">
       <div class="p-6 sm:p-8 border-b border-sky-100 bg-gradient-to-r from-sky-50/95 via-white to-sky-50/70">
         <div class="flex items-center justify-between gap-3">
           <div class="flex items-center gap-3.5">
-            <!-- 3D Key / Shield Badge -->
             <div class="float-a w-12 h-12 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-700 text-white flex items-center justify-center shadow-lg shadow-sky-600/25 border border-sky-300 shrink-0">
               <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 3l7 3v5c0 5-3.2 8.8-7 10-3.8-1.2-7-5-7-10V6l7-3z" />
@@ -322,7 +325,7 @@
       </form>
     </section>
 
-    <!-- Step 2: Authenticated Student Workspace (Hidden Until Login Succeeds) -->
+    <!-- Step 2: Authenticated Student Workspace -->
     <section id="portalWorkspace" class="hidden space-y-6">
 
       <!-- Student Session & Folder Overview -->
@@ -356,7 +359,7 @@
         <div class="px-6 sm:px-8 py-5 bg-gradient-to-r from-sky-100/80 via-sky-50/80 to-white border-b border-sky-200/70 flex items-center justify-between gap-3">
           <div>
             <h3 class="text-base sm:text-lg font-extrabold text-sky-950">Shared Docs &amp; Assignment PDFs</h3>
-            <p class="text-xs text-sky-700/85">Download worksheets from <b>Shared Docs</b> and your personal folder.</p>
+            <p class="text-xs text-sky-700/85">View, annotate, add blank pages, download, or submit any PDF directly.</p>
           </div>
           <button
             type="button"
@@ -368,6 +371,93 @@
         </div>
         <div id="assignmentsPdfList" class="p-6 sm:p-8 space-y-5 text-xs text-sky-900">
           Loading folders...
+        </div>
+
+        <!-- Inline PDF Viewer & Annotator Studio -->
+        <div id="pdfStudioPanel" class="hidden border-t border-sky-200 bg-sky-50/60 p-5 sm:p-7 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <span class="text-[10px] font-extrabold uppercase tracking-wider text-sky-700">Inline PDF Studio</span>
+              <h4 id="studioFileTitle" class="text-sm sm:text-base font-extrabold text-sky-950 truncate">-</h4>
+            </div>
+            <button
+              type="button"
+              id="closeStudioBtn"
+              class="px-3 py-1.5 rounded-xl text-xs font-bold bg-white hover:bg-rose-50 text-sky-900 hover:text-rose-700 border border-sky-200 transition cursor-pointer"
+            >
+              Close Studio
+            </button>
+          </div>
+
+          <!-- Annotation & Page Toolbar -->
+          <div class="flex flex-wrap items-center gap-2 p-2.5 rounded-2xl bg-white border border-sky-200 shadow-2xs text-xs">
+            <button type="button" id="toolPenBtn" class="tool-btn-active px-3 py-1.5 rounded-xl font-bold border border-sky-200 transition cursor-pointer">
+              Pen
+            </button>
+            <button type="button" id="toolHighlighterBtn" class="px-3 py-1.5 rounded-xl font-bold bg-amber-50 text-amber-900 border border-amber-200 transition cursor-pointer">
+              Highlighter
+            </button>
+            <button type="button" id="toolTextBtn" class="px-3 py-1.5 rounded-xl font-bold bg-sky-50 text-sky-900 border border-sky-200 transition cursor-pointer">
+              Add Text
+            </button>
+            <button type="button" id="toolEraserBtn" class="px-3 py-1.5 rounded-xl font-bold bg-slate-50 text-slate-700 border border-slate-200 transition cursor-pointer">
+              Eraser
+            </button>
+
+            <input type="color" id="inkColorInput" value="#0369a1" title="Ink Color" class="w-8 h-8 rounded-lg border border-sky-200 cursor-pointer bg-white p-0.5" />
+
+            <button type="button" id="undoStrokeBtn" class="px-3 py-1.5 rounded-xl font-bold bg-white hover:bg-sky-50 text-sky-900 border border-sky-200 transition cursor-pointer">
+              Undo
+            </button>
+            <button type="button" id="addBlankPageBtn" class="px-3 py-1.5 rounded-xl font-bold bg-cyan-100 hover:bg-cyan-200 text-cyan-950 border border-cyan-300 transition cursor-pointer">
+              + Add Blank Page
+            </button>
+
+            <div class="ml-auto flex items-center gap-1.5 font-bold text-sky-900">
+              <button type="button" id="prevPageBtn" class="px-2.5 py-1 rounded-lg bg-sky-100 hover:bg-sky-200 cursor-pointer">&lt;</button>
+              <span id="pageIndicator" class="px-2 mono">Page 1 / 1</span>
+              <button type="button" id="nextPageBtn" class="px-2.5 py-1 rounded-lg bg-sky-100 hover:bg-sky-200 cursor-pointer">&gt;</button>
+            </div>
+          </div>
+
+          <!-- Text Note Quick Input (used when Add Text is selected) -->
+          <div id="textNoteBar" class="hidden flex flex-wrap items-center gap-2 p-3 rounded-2xl bg-white border border-sky-200">
+            <input
+              type="text"
+              id="annotationTextInput"
+              placeholder="Type note, then click anywhere on the PDF page..."
+              class="input-sky flex-1 min-w-[200px] px-3.5 py-2 rounded-xl text-xs"
+            />
+          </div>
+
+          <!-- Layered PDF Render + Annotation Canvas -->
+          <div class="w-full overflow-auto rounded-2xl bg-sky-950/10 p-3 border border-sky-200 flex justify-center">
+            <div id="pdfPageStage" class="relative shadow-lg bg-white select-none">
+              <canvas id="pdfRenderCanvas" class="block rounded-lg"></canvas>
+              <canvas id="pdfAnnotCanvas" class="absolute inset-0 w-full h-full rounded-lg cursor-crosshair"></canvas>
+            </div>
+          </div>
+
+          <!-- Save & Direct Submit Bar -->
+          <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+            <p id="studioStatusText" class="text-xs font-semibold text-sky-800"></p>
+            <div class="flex flex-wrap gap-2.5">
+              <button
+                type="button"
+                id="saveAnnotatedBtn"
+                class="px-4 py-2.5 rounded-xl bg-white hover:bg-sky-50 text-sky-950 font-extrabold text-xs border border-sky-300 shadow-2xs transition cursor-pointer"
+              >
+                Save Annotated PDF
+              </button>
+              <button
+                type="button"
+                id="directSubmitAnnotatedBtn"
+                class="btn-3d-blue px-4 py-2.5 rounded-xl text-white font-extrabold text-xs transition cursor-pointer"
+              >
+                Submit Annotated PDF Directly
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -381,7 +471,6 @@
         </div>
 
         <form id="submissionForm" class="p-6 sm:p-8 space-y-6">
-          <!-- File Upload Dropzone -->
           <div>
             <label class="block text-sm font-bold text-sky-950 mb-1.5">
               Attach Assignment Files <span class="text-rose-500">*</span>
@@ -404,11 +493,9 @@
               </p>
             </div>
 
-            <!-- Selected Files List -->
             <ul id="fileList" class="mt-3 space-y-2 hidden"></ul>
           </div>
 
-          <!-- Optional Notes -->
           <div>
             <label for="studentNotes" class="block text-sm font-bold text-sky-950 mb-1.5">
               Submission Notes <span class="text-sky-600/70 font-normal">(Optional)</span>
@@ -421,10 +508,8 @@
             ></textarea>
           </div>
 
-          <!-- Status Alert -->
           <div id="statusBox" class="hidden rounded-xl p-4 text-sm"></div>
 
-          <!-- Single Clean Submit Action -->
           <button
             id="submitBtn"
             type="submit"
@@ -445,7 +530,11 @@
   </footer>
 
   <script>
-    // 1. Interactive Three.js 3D Learning Scene (Floating Knowledge Core + Orbiting Book/Folder Cubes + Sky Particles)
+    if (window.pdfjsLib) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+
+    // 1. Interactive Three.js 3D Learning Scene
     (function initThreeScene() {
       const container = document.getElementById('threeContainer');
       const canvas = document.getElementById('threeCanvas');
@@ -459,10 +548,7 @@
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
       renderer.setSize(container.clientWidth, container.clientHeight);
 
-      // Sky & Ocean Lighting
-      const ambientLight = new THREE.AmbientLight(0xe0f2fe, 1.05);
-      scene.add(ambientLight);
-
+      scene.add(new THREE.AmbientLight(0xe0f2fe, 1.05));
       const keyLight = new THREE.DirectionalLight(0xffffff, 1.35);
       keyLight.position.set(4, 6, 5);
       scene.add(keyLight);
@@ -474,62 +560,57 @@
       const worldGroup = new THREE.Group();
       scene.add(worldGroup);
 
-      // Central 3D Icosahedron "Knowledge Crystal"
-      const coreGeo = new THREE.IcosahedronGeometry(1.12, 0);
-      const coreMat = new THREE.MeshStandardMaterial({
-        color: 0x38bdf8,
-        emissive: 0x0284c7,
-        emissiveIntensity: 0.35,
-        roughness: 0.22,
-        metalness: 0.25,
-        flatShading: true
-      });
-      const coreMesh = new THREE.Mesh(coreGeo, coreMat);
+      const coreMesh = new THREE.Mesh(
+        new THREE.IcosahedronGeometry(1.12, 0),
+        new THREE.MeshStandardMaterial({
+          color: 0x38bdf8,
+          emissive: 0x0284c7,
+          emissiveIntensity: 0.35,
+          roughness: 0.22,
+          metalness: 0.25,
+          flatShading: true
+        })
+      );
       worldGroup.add(coreMesh);
 
-      // Wireframe Sky Halo around the Knowledge Crystal
-      const wireGeo = new THREE.IcosahedronGeometry(1.38, 1);
-      const wireMat = new THREE.MeshBasicMaterial({
-        color: 0xe0f2fe,
-        wireframe: true,
-        transparent: true,
-        opacity: 0.35
-      });
-      const wireMesh = new THREE.Mesh(wireGeo, wireMat);
+      const wireMesh = new THREE.Mesh(
+        new THREE.IcosahedronGeometry(1.38, 1),
+        new THREE.MeshBasicMaterial({
+          color: 0xe0f2fe,
+          wireframe: true,
+          transparent: true,
+          opacity: 0.35
+        })
+      );
       worldGroup.add(wireMesh);
 
-      // Orbiting 3D Torus Ring
-      const ringGeo = new THREE.TorusGeometry(2.05, 0.045, 16, 72);
-      const ringMat = new THREE.MeshStandardMaterial({
-        color: 0xbae6fd,
-        emissive: 0x7dd3fc,
-        emissiveIntensity: 0.3,
-        roughness: 0.3
-      });
-      const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+      const ringMesh = new THREE.Mesh(
+        new THREE.TorusGeometry(2.05, 0.045, 16, 72),
+        new THREE.MeshStandardMaterial({
+          color: 0xbae6fd,
+          emissive: 0x7dd3fc,
+          emissiveIntensity: 0.3,
+          roughness: 0.3
+        })
+      );
       ringMesh.rotation.x = Math.PI / 2.7;
       ringMesh.rotation.y = 0.25;
       worldGroup.add(ringMesh);
 
-      // 3D Floating Assignment Cubes (Representing Shared Docs, Personal Folder, & Submissions)
       const satelliteSpecs = [
         { color: 0xffffff, angle: 0, radius: 2.05, size: 0.36 },
         { color: 0x7dd3fc, angle: (Math.PI * 2) / 3, radius: 2.05, size: 0.34 },
         { color: 0x34d399, angle: (Math.PI * 4) / 3, radius: 2.05, size: 0.32 }
       ];
       const satellites = satelliteSpecs.map(spec => {
-        const boxGeo = new THREE.BoxGeometry(spec.size, spec.size * 1.25, spec.size * 0.45);
-        const boxMat = new THREE.MeshStandardMaterial({
-          color: spec.color,
-          roughness: 0.25,
-          metalness: 0.15
-        });
-        const mesh = new THREE.Mesh(boxGeo, boxMat);
+        const mesh = new THREE.Mesh(
+          new THREE.BoxGeometry(spec.size, spec.size * 1.25, spec.size * 0.45),
+          new THREE.MeshStandardMaterial({ color: spec.color, roughness: 0.25, metalness: 0.15 })
+        );
         worldGroup.add(mesh);
         return { mesh, baseAngle: spec.angle, radius: spec.radius };
       });
 
-      // Floating Sky Star/Cloud Particles
       const particleCount = 48;
       const positions = new Float32Array(particleCount * 3);
       for (let i = 0; i < particleCount; i++) {
@@ -539,16 +620,12 @@
       }
       const pGeo = new THREE.BufferGeometry();
       pGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-      const pMat = new THREE.PointsMaterial({
-        color: 0xe0f2fe,
-        size: 0.08,
-        transparent: true,
-        opacity: 0.85
-      });
-      const particles = new THREE.Points(pGeo, pMat);
+      const particles = new THREE.Points(
+        pGeo,
+        new THREE.PointsMaterial({ color: 0xe0f2fe, size: 0.08, transparent: true, opacity: 0.85 })
+      );
       scene.add(particles);
 
-      // Drag-to-spin interaction
       let isDragging = false;
       let prevX = 0;
       let prevY = 0;
@@ -582,10 +659,7 @@
       function animate() {
         requestAnimationFrame(animate);
         const t = clock.getElapsedTime();
-
-        if (!isDragging) {
-          targetRotY += 0.005;
-        }
+        if (!isDragging) targetRotY += 0.005;
         worldGroup.rotation.y += (targetRotY - worldGroup.rotation.y) * 0.08;
         worldGroup.rotation.x += (targetRotX - worldGroup.rotation.x) * 0.08;
 
@@ -610,7 +684,6 @@
       animate();
     })();
 
-    // Subtle 3D tilt on the outer hero banner
     const heroStageWrap = document.getElementById('heroStageWrap');
     const heroStageCard = document.getElementById('heroStageCard');
     if (heroStageWrap && heroStageCard) {
@@ -672,7 +745,7 @@
       const safeName = escapeHtml(file.name);
       const safeScope = escapeHtml(file.scope || 'shared');
       return `
-        <div class="flex items-center justify-between gap-3 px-4 py-3 rounded-2xl bg-white/95 border border-sky-200/90 shadow-2xs hover:border-sky-400 hover:shadow-sm transition">
+        <div class="flex flex-wrap items-center justify-between gap-3 px-4 py-3 rounded-2xl bg-white/95 border border-sky-200/90 shadow-2xs hover:border-sky-400 hover:shadow-sm transition">
           <div class="flex items-center gap-3 min-w-0">
             <span class="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-100 to-blue-100 text-sky-800 flex items-center justify-center font-extrabold text-[10px] shrink-0 border border-sky-300 shadow-2xs">
               PDF
@@ -682,13 +755,22 @@
               <span class="text-sky-600/85 ml-2">(${Math.max(1, Math.round((file.size || 0) / 1024))} KB)</span>
             </div>
           </div>
-          <button
-            type="button"
-            onclick="downloadPublishedPdf('${safeName}', '${safeScope}', this)"
-            class="shrink-0 px-3.5 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-bold shadow-xs transition cursor-pointer"
-          >
-            Download PDF
-          </button>
+          <div class="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onclick="openPdfInStudio('${safeName}', '${safeScope}', this)"
+              class="px-3 py-2 rounded-xl bg-sky-100 hover:bg-sky-200 text-sky-950 font-bold border border-sky-300 transition cursor-pointer"
+            >
+              View &amp; Annotate
+            </button>
+            <button
+              type="button"
+              onclick="downloadPublishedPdf('${safeName}', '${safeScope}', this)"
+              class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-bold shadow-xs transition cursor-pointer"
+            >
+              Download PDF
+            </button>
+          </div>
         </div>
       `;
     }
@@ -758,23 +840,35 @@
       }
     }
 
+    async function fetchPdfBytes(fileName, scope) {
+      const url = `${config.relay}?action=downloadPdf&repo=${encodeURIComponent(config.repo)}&assignment=${encodeURIComponent(config.assignment)}&file=${encodeURIComponent(fileName)}&scope=${encodeURIComponent(scope || 'shared')}${getStudentAuthQuery()}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (!data.ok || !data.base64) {
+        throw new Error(data.error || 'Could not fetch PDF.');
+      }
+      const binaryStr = atob(data.base64);
+      const bytes = new Uint8Array(binaryStr.length);
+      for (let i = 0; i < binaryStr.length; i++) {
+        bytes[i] = binaryStr.charCodeAt(i);
+      }
+      return { name: data.name || fileName, bytes };
+    }
+
     async function downloadPublishedPdf(fileName, scope, btnEl) {
       const originalText = btnEl.textContent;
       btnEl.disabled = true;
       btnEl.textContent = 'Downloading...';
       try {
-        const url = `${config.relay}?action=downloadPdf&repo=${encodeURIComponent(config.repo)}&assignment=${encodeURIComponent(config.assignment)}&file=${encodeURIComponent(fileName)}&scope=${encodeURIComponent(scope || 'shared')}${getStudentAuthQuery()}`;
-        const res = await fetch(url);
-        const data = await res.json();
-        if (!data.ok || !data.base64) {
-          throw new Error(data.error || 'Download failed.');
-        }
+        const { name, bytes } = await fetchPdfBytes(fileName, scope);
+        const blob = new Blob([bytes], { type: 'application/pdf' });
         const link = document.createElement('a');
-        link.href = `data:application/pdf;base64,${data.base64}`;
-        link.download = data.name || fileName;
+        link.href = URL.createObjectURL(blob);
+        link.download = name;
         document.body.appendChild(link);
         link.click();
         link.remove();
+        setTimeout(() => URL.revokeObjectURL(link.href), 1500);
       } catch (err) {
         showStatus(`<strong>PDF Download Failed:</strong> ${escapeHtml(err.message)}`, 'error');
       } finally {
@@ -782,6 +876,343 @@
         btnEl.textContent = originalText;
       }
     }
+
+    // Inline PDF Viewer, Annotator & Blank Page Studio State
+    const pdfStudioPanel = document.getElementById('pdfStudioPanel');
+    const studioFileTitle = document.getElementById('studioFileTitle');
+    const closeStudioBtn = document.getElementById('closeStudioBtn');
+    const pdfRenderCanvas = document.getElementById('pdfRenderCanvas');
+    const pdfAnnotCanvas = document.getElementById('pdfAnnotCanvas');
+    const annotCtx = pdfAnnotCanvas.getContext('2d');
+    const pageIndicator = document.getElementById('pageIndicator');
+    const studioStatusText = document.getElementById('studioStatusText');
+    const textNoteBar = document.getElementById('textNoteBar');
+    const annotationTextInput = document.getElementById('annotationTextInput');
+    const inkColorInput = document.getElementById('inkColorInput');
+
+    let studioState = {
+      fileName: '',
+      basePdfBytes: null,
+      pdfJsDoc: null,
+      totalPages: 1,
+      currentPage: 1,
+      extraBlankPages: 0,
+      tool: 'pen', // 'pen' | 'highlighter' | 'text' | 'eraser'
+      strokesByPage: {}, // pageNum -> array of stroke/text objects
+      activeStroke: null
+    };
+
+    function setActiveTool(newTool) {
+      studioState.tool = newTool;
+      ['toolPenBtn', 'toolHighlighterBtn', 'toolTextBtn', 'toolEraserBtn'].forEach(id => {
+        document.getElementById(id).classList.remove('tool-btn-active');
+      });
+      const map = {
+        pen: 'toolPenBtn',
+        highlighter: 'toolHighlighterBtn',
+        text: 'toolTextBtn',
+        eraser: 'toolEraserBtn'
+      };
+      document.getElementById(map[newTool]).classList.add('tool-btn-active');
+      textNoteBar.classList.toggle('hidden', newTool !== 'text');
+      pdfAnnotCanvas.style.cursor = newTool === 'text' ? 'text' : 'crosshair';
+    }
+
+    document.getElementById('toolPenBtn').addEventListener('click', () => setActiveTool('pen'));
+    document.getElementById('toolHighlighterBtn').addEventListener('click', () => setActiveTool('highlighter'));
+    document.getElementById('toolTextBtn').addEventListener('click', () => setActiveTool('text'));
+    document.getElementById('toolEraserBtn').addEventListener('click', () => setActiveTool('eraser'));
+
+    closeStudioBtn.addEventListener('click', () => {
+      pdfStudioPanel.classList.add('hidden');
+      studioStatusText.textContent = '';
+    });
+
+    async function openPdfInStudio(fileName, scope, btnEl) {
+      const originalText = btnEl.textContent;
+      btnEl.disabled = true;
+      btnEl.textContent = 'Opening...';
+      studioStatusText.textContent = 'Loading PDF into studio...';
+      try {
+        const { name, bytes } = await fetchPdfBytes(fileName, scope);
+        if (!window.pdfjsLib) throw new Error('PDF viewer library not loaded.');
+        const loadingTask = pdfjsLib.getDocument({ data: bytes.slice(0) });
+        const pdfJsDoc = await loadingTask.promise;
+
+        studioState = {
+          fileName: name,
+          basePdfBytes: bytes,
+          pdfJsDoc,
+          totalPages: pdfJsDoc.numPages,
+          currentPage: 1,
+          extraBlankPages: 0,
+          tool: 'pen',
+          strokesByPage: {},
+          activeStroke: null
+        };
+        setActiveTool('pen');
+        studioFileTitle.textContent = name;
+        pdfStudioPanel.classList.remove('hidden');
+        await renderStudioPage(1);
+        studioStatusText.textContent = 'Ready — draw with Pen/Highlighter, add text, or insert blank pages.';
+        pdfStudioPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } catch (err) {
+        showStatus(`<strong>Could not open PDF:</strong> ${escapeHtml(err.message)}`, 'error');
+      } finally {
+        btnEl.disabled = false;
+        btnEl.textContent = originalText;
+      }
+    }
+
+    function redrawAnnotationsForPage(pageNum) {
+      annotCtx.clearRect(0, 0, pdfAnnotCanvas.width, pdfAnnotCanvas.height);
+      const items = studioState.strokesByPage[pageNum] || [];
+      for (const item of items) {
+        if (item.kind === 'text') {
+          annotCtx.save();
+          annotCtx.font = 'bold 16px "Plus Jakarta Sans", sans-serif';
+          annotCtx.fillStyle = item.color;
+          annotCtx.fillText(item.text, item.x, item.y);
+          annotCtx.restore();
+        } else if (item.kind === 'stroke' && item.points.length > 1) {
+          annotCtx.save();
+          annotCtx.lineCap = 'round';
+          annotCtx.lineJoin = 'round';
+          if (item.tool === 'eraser') {
+            annotCtx.globalCompositeOperation = 'destination-out';
+            annotCtx.lineWidth = 22;
+            annotCtx.strokeStyle = 'rgba(0,0,0,1)';
+          } else if (item.tool === 'highlighter') {
+            annotCtx.globalCompositeOperation = 'source-over';
+            annotCtx.globalAlpha = 0.35;
+            annotCtx.lineWidth = 18;
+            annotCtx.strokeStyle = item.color;
+          } else {
+            annotCtx.globalCompositeOperation = 'source-over';
+            annotCtx.globalAlpha = 1;
+            annotCtx.lineWidth = 2.6;
+            annotCtx.strokeStyle = item.color;
+          }
+          annotCtx.beginPath();
+          annotCtx.moveTo(item.points[0].x, item.points[0].y);
+          for (let i = 1; i < item.points.length; i++) {
+            annotCtx.lineTo(item.points[i].x, item.points[i].y);
+          }
+          annotCtx.stroke();
+          annotCtx.restore();
+        }
+      }
+    }
+
+    async function renderStudioPage(pageNum) {
+      studioState.currentPage = pageNum;
+      const total = studioState.totalPages + studioState.extraBlankPages;
+      pageIndicator.textContent = `Page ${pageNum} / ${total}`;
+
+      const renderCtx = pdfRenderCanvas.getContext('2d');
+      if (pageNum <= studioState.totalPages && studioState.pdfJsDoc) {
+        const page = await studioState.pdfJsDoc.getPage(pageNum);
+        const viewport = page.getViewport({ scale: 1.25 });
+        pdfRenderCanvas.width = viewport.width;
+        pdfRenderCanvas.height = viewport.height;
+        pdfAnnotCanvas.width = viewport.width;
+        pdfAnnotCanvas.height = viewport.height;
+        await page.render({ canvasContext: renderCtx, viewport }).promise;
+      } else {
+        // Blank working page (standard A4-ish aspect)
+        pdfRenderCanvas.width = 680;
+        pdfRenderCanvas.height = 920;
+        pdfAnnotCanvas.width = 680;
+        pdfAnnotCanvas.height = 920;
+        renderCtx.fillStyle = '#ffffff';
+        renderCtx.fillRect(0, 0, 680, 920);
+        renderCtx.strokeStyle = '#e0f2fe';
+        renderCtx.lineWidth = 1;
+        for (let y = 36; y < 900; y += 36) {
+          renderCtx.beginPath();
+          renderCtx.moveTo(24, y);
+          renderCtx.lineTo(656, y);
+          renderCtx.stroke();
+        }
+      }
+      redrawAnnotationsForPage(pageNum);
+    }
+
+    function getCanvasCoords(e) {
+      const rect = pdfAnnotCanvas.getBoundingClientRect();
+      const scaleX = pdfAnnotCanvas.width / (rect.width || 1);
+      const scaleY = pdfAnnotCanvas.height / (rect.height || 1);
+      return {
+        x: (e.clientX - rect.left) * scaleX,
+        y: (e.clientY - rect.top) * scaleY
+      };
+    }
+
+    pdfAnnotCanvas.addEventListener('pointerdown', (e) => {
+      const pt = getCanvasCoords(e);
+      const p = studioState.currentPage;
+      if (!studioState.strokesByPage[p]) studioState.strokesByPage[p] = [];
+
+      if (studioState.tool === 'text') {
+        const noteText = (annotationTextInput.value || '').trim();
+        if (!noteText) {
+          studioStatusText.textContent = 'Type your text note in the box first, then click on the page.';
+          return;
+        }
+        studioState.strokesByPage[p].push({
+          kind: 'text',
+          x: pt.x,
+          y: pt.y,
+          text: noteText,
+          color: inkColorInput.value || '#0369a1'
+        });
+        redrawAnnotationsForPage(p);
+        return;
+      }
+
+      studioState.activeStroke = {
+        kind: 'stroke',
+        tool: studioState.tool,
+        color: inkColorInput.value || '#0369a1',
+        points: [pt]
+      };
+      studioState.strokesByPage[p].push(studioState.activeStroke);
+    });
+
+    pdfAnnotCanvas.addEventListener('pointermove', (e) => {
+      if (!studioState.activeStroke) return;
+      const pt = getCanvasCoords(e);
+      studioState.activeStroke.points.push(pt);
+      redrawAnnotationsForPage(studioState.currentPage);
+    });
+
+    window.addEventListener('pointerup', () => {
+      studioState.activeStroke = null;
+    });
+
+    document.getElementById('undoStrokeBtn').addEventListener('click', () => {
+      const list = studioState.strokesByPage[studioState.currentPage];
+      if (list && list.length) {
+        list.pop();
+        redrawAnnotationsForPage(studioState.currentPage);
+      }
+    });
+
+    document.getElementById('addBlankPageBtn').addEventListener('click', async () => {
+      studioState.extraBlankPages += 1;
+      const newPageNum = studioState.totalPages + studioState.extraBlankPages;
+      await renderStudioPage(newPageNum);
+      studioStatusText.textContent = `Added blank page ${newPageNum}.`;
+    });
+
+    document.getElementById('prevPageBtn').addEventListener('click', async () => {
+      if (studioState.currentPage > 1) {
+        await renderStudioPage(studioState.currentPage - 1);
+      }
+    });
+
+    document.getElementById('nextPageBtn').addEventListener('click', async () => {
+      const total = studioState.totalPages + studioState.extraBlankPages;
+      if (studioState.currentPage < total) {
+        await renderStudioPage(studioState.currentPage + 1);
+      }
+    });
+
+    function hexToPdfRgb(hex) {
+      const clean = (hex || '#0369a1').replace('#', '');
+      const num = parseInt(clean.length === 3 ? clean.split('').map(c => c + c).join('') : clean, 16);
+      return {
+        r: ((num >> 16) & 255) / 255,
+        g: ((num >> 8) & 255) / 255,
+        b: (num & 255) / 255
+      };
+    }
+
+    async function exportAnnotatedPdfFile() {
+      if (!studioState.basePdfBytes || !window.PDFLib) {
+        throw new Error('PDF editor library unavailable.');
+      }
+      const { PDFDocument, rgb } = PDFLib;
+      const pdfDoc = await PDFDocument.load(studioState.basePdfBytes);
+
+      // Append blank pages if requested
+      for (let i = 0; i < studioState.extraBlankPages; i++) {
+        pdfDoc.addPage([595.28, 841.89]); // A4 size in PDF points
+      }
+
+      const pages = pdfDoc.getPages();
+      for (let idx = 0; idx < pages.length; idx++) {
+        const pageNum = idx + 1;
+        const page = pages[idx];
+        const { width, height } = page.getSize();
+        const items = studioState.strokesByPage[pageNum] || [];
+
+        // Match rendered canvas aspect if present
+        const canvasW = pdfAnnotCanvas.width || width;
+        const canvasH = pdfAnnotCanvas.height || height;
+
+        for (const item of items) {
+          const { r, g, b } = hexToPdfRgb(item.color);
+          if (item.kind === 'text') {
+            const px = (item.x / canvasW) * width;
+            const py = height - (item.y / canvasH) * height;
+            page.drawText(item.text, {
+              x: px,
+              y: py,
+              size: 12,
+              color: rgb(r, g, b)
+            });
+          } else if (item.kind === 'stroke' && item.tool !== 'eraser' && item.points.length > 1) {
+            for (let pIdx = 1; pIdx < item.points.length; pIdx++) {
+              const a = item.points[pIdx - 1];
+              const bPt = item.points[pIdx];
+              page.drawLine({
+                start: { x: (a.x / canvasW) * width, y: height - (a.y / canvasH) * height },
+                end: { x: (bPt.x / canvasW) * width, y: height - (bPt.y / canvasH) * height },
+                thickness: item.tool === 'highlighter' ? 10 : 2,
+                opacity: item.tool === 'highlighter' ? 0.35 : 1,
+                color: rgb(r, g, b)
+              });
+            }
+          }
+        }
+      }
+
+      const outBytes = await pdfDoc.save();
+      const baseName = studioState.fileName.replace(/\.pdf$/i, '');
+      const outName = `${baseName}_annotated.pdf`;
+      return new File([outBytes], outName, { type: 'application/pdf' });
+    }
+
+    document.getElementById('saveAnnotatedBtn').addEventListener('click', async () => {
+      try {
+        studioStatusText.textContent = 'Building annotated PDF...';
+        const file = await exportAnnotatedPdfFile();
+        const url = URL.createObjectURL(file);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = file.name;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1500);
+        studioStatusText.textContent = `Saved ${file.name} to your device.`;
+      } catch (err) {
+        studioStatusText.textContent = `Save failed: ${err.message}`;
+      }
+    });
+
+    document.getElementById('directSubmitAnnotatedBtn').addEventListener('click', async () => {
+      try {
+        studioStatusText.textContent = 'Preparing annotated PDF for submission...';
+        const file = await exportAnnotatedPdfFile();
+        addFiles([file]);
+        studioStatusText.textContent = `Attached ${file.name} to your submission box below.`;
+        document.getElementById('submissionForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } catch (err) {
+        studioStatusText.textContent = `Could not prepare submission: ${err.message}`;
+      }
+    });
 
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -847,6 +1278,7 @@
       selectedFiles = [];
       renderFileList();
       statusBox.classList.add('hidden');
+      pdfStudioPanel.classList.add('hidden');
       portalWorkspace.classList.add('hidden');
       logoutBtn.classList.add('hidden');
       loginCard.classList.remove('hidden');
